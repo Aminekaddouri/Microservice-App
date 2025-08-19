@@ -1,0 +1,20 @@
+version: '3.8'
+
+services:
+  auth-service:
+    build: ./services/auth-service
+    env_file:
+      - ./services/auth-service/.env
+    volumes:
+      - auth-data:/app/data
+    ports:
+      - "3001:3001"
+    networks:
+      - ft_net
+
+networks:
+  ft_net:
+    driver: bridge
+
+volumes:
+  auth-data:
