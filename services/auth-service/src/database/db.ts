@@ -1,4 +1,3 @@
-// src/database/db.ts
 import sqlite3 from 'sqlite3';
 
 const dbPath = process.env.DATABASE_PATH || '/app/data/auth.sqlite';

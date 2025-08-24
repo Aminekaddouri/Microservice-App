@@ -1,4 +1,3 @@
-// src/database/init-db.ts
 import  db  from './db';
 
 db.exec(`

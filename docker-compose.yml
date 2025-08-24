@@ -1,14 +1,64 @@
 version: '3.8'
 
 services:
+  # -----------------------------
+  # 🔐 Auth Service
+  # Handles: register, login, JWT, Google OAuth2
+  # -----------------------------
   auth-service:
     build: ./services/auth-service
     env_file:
       - ./services/auth-service/.env
     volumes:
       - auth-data:/app/data
+    #ports:
+    #  - "3001:3001"
+    networks:
+      - ft_net
+  # -----------------------------
+  # 👥 User Service
+  # Handles: profiles, friendships
+  # -----------------------------
+  user-service:
+    build: ./services/user-service
+    env_file:
+      - ./services/user-service/.env
+    volumes:
+      - user-data:/app/data
+    #ports:
+    #  - "3002:3002"
+    networks:
+      - ft_net
+
+  # -----------------------------
+  # Chat Service
+  # -----------------------------
+  chat-service:
+    build: ./services/chat-service
+    env_file:
+      - ./services/chat-service/.env
+    depends_on:
+      - user-service
+    volumes:
+      - chat-data:/app/data
+    #ports:
+    #  - "3002:3002"
+    networks:
+      - ft_net
+
+  # -----------------------------
+  # 🌐 Nginx API Gateway + Frontend
+  # Routes: /api/* → services, / → frontend
+  # -----------------------------
+  nginx:
+    build: ./nginx
     ports:
-      - "3001:3001"
+      - "80:80"
+      # - "443:443"  # Uncomment when using SSL
+    depends_on:
+      - auth-service
+      - user-service
+      - chat-service
     networks:
       - ft_net
 
@@ -18,3 +68,5 @@ networks:
 
 volumes:
   auth-data:
+  user-data:
+  chat-data:
