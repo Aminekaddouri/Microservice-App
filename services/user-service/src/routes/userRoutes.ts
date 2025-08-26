@@ -10,4 +10,5 @@ export default async function userRoutes(
   fastify.get('/:id', userController.getUserById);
   fastify.put('/:id', { preHandler: canAccessUser }, userController.updateUser);
   fastify.delete('/:id', { preHandler: canAccessUser }, userController.deleteUser);
+  fastify.post('/sync', userController.syncUser); //*******************//
 }

@@ -4,6 +4,7 @@ import { authenticate } from './middlewares/authenticate';
 import messageRoutes from './routes/messageRoutes';
 import cors from '@fastify/cors';
 import { setupSocketHandlers } from './socket/socketHandler';
+import { Server as SocketIOServer } from 'socket.io';
 
 const fastify = Fastify({ logger: true });
 

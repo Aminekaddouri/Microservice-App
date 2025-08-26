@@ -44,7 +44,7 @@ let isSocketSetup = false;
 let isEventsSetup = false;
 let isSending = false;
 
-let socket = io('http://localhost', {
+let socket = io('http://localhost', { //**********************//
     auth: {
         token: getAccessToken()
     },

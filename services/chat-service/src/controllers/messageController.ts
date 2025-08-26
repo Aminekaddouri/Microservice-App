@@ -1,10 +1,7 @@
 import { FastifyRequest, FastifyReply } from "fastify";
 import messageModel, { Message } from "../models/messageModel"
+import { ClearConvParams } from '../types'; //*************//
 
-interface ClearConvParams {
-    id: string;
-    friendId: string;
-}
 
 async function getConvMessages(
     request: FastifyRequest<{
@@ -78,7 +75,7 @@ async function getUserConversations(
 
 async function sendMessage(
     request: FastifyRequest<{
-        Body: Omit<Message, 'id | sentAt | readAt'>
+        Body: Omit<Message, 'id' | 'sentAt' | 'readAt'> //*************//
     }>,
     reply: FastifyReply,
 ): Promise<void> {
@@ -159,7 +156,7 @@ async function deleteMessage(
         const result = await messageModel.deleteMessage(id);
         if (result)
             reply.status(203).send({ 
-        success: false,
+            success: true, //*************//
             message: 'Message deleted successfully!' });
         else
             reply.status(500).send({ 

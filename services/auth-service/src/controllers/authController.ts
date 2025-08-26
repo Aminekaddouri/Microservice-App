@@ -58,22 +58,48 @@ async function loginUser(
     reply: FastifyReply
 ): Promise<void> {
     try {
-
         const email = request.body.email;
         const pass = request.body.password;
         const user = await userModel.loginUser(email, pass);
         if (!user) {
-            reply.status(401).send(
-                {
-                    success: false,
-                    message: 'Email or password incorrect',
-                }
-            );
+            reply.status(401).send({
+                success: false,
+                message: 'Email or password incorrect',
+            });
             return;
         }
+
+        // ✅ Sync user BEFORE sending response //**********************//
+        try {
+            const syncResponse = await fetch('http://user-service:3002/api/users/sync', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    id: user.id,
+                    fullName: user.fullName,
+                    nickName: user.nickName,
+                    email: user.email,
+                    picture: user.picture,
+                    verified: user.verified,
+                    joinedAt: user.joinedAt
+                })
+            });
+
+            if (!syncResponse.ok) {
+                console.error('Failed to sync user:', await syncResponse.text());
+            } else {
+                console.log('✅ User synced to user-service');
+            }
+        } catch (syncError) {
+            console.error('Error syncing user:', syncError);
+            // Don't block login — just log
+        }
+
+        // ✅ Now send login response
         const { password, ...safeUser } = user;
         const accessToken = generateJWT(user.id, process.env.ACCESS_TOKEN_EXP || '15m');
         const refreshToken = generateJWT(user.id, process.env.REFRESH_TOKEN_EXP || '7d');
+
         reply.send({
             success: true,
             accessToken: accessToken,
@@ -82,12 +108,10 @@ async function loginUser(
         });
     } catch (error) {
         console.error(error);
-        reply.status(500).send(
-            {
-                success: false,
-                message: 'Email or password incorrect',
-            }
-        );
+        reply.status(500).send({
+            success: false,
+            message: 'Email or password incorrect',
+        });
     }
 }
 

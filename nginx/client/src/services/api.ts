@@ -9,7 +9,7 @@ import { NotificationResponse } from "@/types/notitication";
 
 
 
-const BACKEND_BASE_URL = '/api/';
+const BACKEND_BASE_URL = '/api/'; //**************************//
 
 class ApiClient {
     private baseUrl: string;
@@ -32,7 +32,8 @@ class ApiClient {
         endpoint: string,
         options: RequestInit = {},
     ): Promise<T> {
-        const url = `${this.baseUrl}${endpoint}`
+        const url = `${this.baseUrl}${endpoint}`;
+        console.log('🚀 API Request:', url, options); // 🔥 Add this
         const config: RequestInit = {
             ...options,
             headers: {
@@ -124,7 +125,7 @@ class ApiClient {
     }
 
     async googleAuth(token: string) {
-        return this.request<AuthResponse>('auth/google/callback',
+        return this.request<AuthResponse>('auth/google/callback', //*********************//
             {
                 method: 'POST',
                 body: JSON.stringify({ token }),
@@ -154,10 +155,14 @@ class ApiClient {
     }
 
     async getAllUsers(): Promise<UserResponse> {
-        return this.request<UserResponse>('users/');
+        return this.request<UserResponse>('users'); //**********************//
     }
 
     async addFriend(friendId: string): Promise<any> {
+        console.log('Adding friend:', friendId); //**************//
+        if (!friendId) { //**************//
+            throw new Error('Invalid friendId'); //**************//
+        } //**************//
         return this.request<any>('friendship/add-friend', {
             method: 'POST',
             body: JSON.stringify({ targetUserId: friendId })

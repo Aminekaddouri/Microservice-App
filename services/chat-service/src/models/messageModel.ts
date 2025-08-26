@@ -54,7 +54,7 @@ export async function sendMessage(messageData: {
     content: string;
 }): Promise<Message> {
     const db = await openDB();
-    const id = uuidv4();
+    const id = uuidv4(); //*************//
     const sentAt = new Date().toISOString();
     
     await db.run(

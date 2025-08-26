@@ -1,5 +1,6 @@
 import { FastifyRequest, FastifyReply } from 'fastify';
 import userModel, { User } from '../models/userModel';
+import { openDB } from '../database/db'; //************//
 
 async function getAllUsers(
     request: FastifyRequest,
@@ -102,9 +103,44 @@ async function deleteUser(
     }
 }
 
+//*************//
+async function syncUser(
+    request: FastifyRequest<{ Body: User }>,
+    reply: FastifyReply
+  ): Promise<void> {
+    try {
+      const user = request.body;
+      const existing = await userModel.findUserById(user.id);
+  
+      if (existing) {
+        // Update existing user
+        await userModel.updateUserById(user.id, {
+          fullName: user.fullName,
+          nickName: user.nickName,
+          email: user.email,
+          picture: user.picture,
+        });
+      } else {
+        // Insert new user (without password)
+        const db = await openDB();
+        await db.run(
+          `INSERT INTO User (id, fullName, nickName, email, picture, verified, joinedAt) 
+           VALUES (?, ?, ?, ?, ?, ?, ?)`,
+          [user.id, user.fullName, user.nickName, user.email, user.picture, user.verified, user.joinedAt]
+        );
+      }
+  
+      reply.send({ success: true, message: 'User synced successfully' });
+    } catch (error) {
+      console.error('Sync failed:', error);
+      reply.status(500).send({ success: false, message: 'Failed to sync user' });
+    }
+  }
+
 export default {
     getAllUsers,
     getUserById,
     updateUser,
     deleteUser,
+    syncUser,
 };

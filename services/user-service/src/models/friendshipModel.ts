@@ -11,6 +11,9 @@ export type Friendship = {
 };
 
 function normalizePair(userA: string, userB: string): [string, string] {
+    if (!userA || !userB) { //************//
+        throw new Error(`Invalid user IDs: userA=${userA}, userB=${userB}`); //************//
+    } //************//
     return userA < userB ? [userA, userB] : [userB, userA];
 }
 
@@ -18,12 +21,12 @@ async function createFriendRequest(userA: string, userB: string): Promise<Friend
     const db = await openDB();
     const [user1ID, user2ID] = normalizePair(userA, userB);
     const id = uuidv4();
-
+    console.log('🔄 Normalizing:', { userA, userB }, '→', [user1ID, user2ID]);
     await db.run(
         `INSERT INTO Friendship (id, user1ID, user2ID, status) VALUES (?, ?, ?, ?)`,
         [id, user1ID, user2ID, FriendshipStatus.Pending]
     );
-
+    console.log('🔄 Normalizing:', { userA, userB }, '→', [user1ID, user2ID]);
     return {
         id,
         user1ID,

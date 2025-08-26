@@ -1,6 +1,7 @@
 import { FastifyRequest, FastifyReply } from "fastify";
 import friendshipModel from '../models/friendshipModel';
 import { FriendshipStatus } from '../types/FriendshipStatus';
+import userModel from '../models/userModel'; //************//
 
 async function addFriend(
     request: FastifyRequest<{ Body: { targetUserId: string } }>,
@@ -9,14 +10,38 @@ async function addFriend(
     try {
         const userId = request.userId;
         const targetUserId = request.body.targetUserId;
+        console.log('🎯 Adding friend:', { userId, targetUserId }); //************//
+        console.log('🎯 Headers:', request.headers); //************//
+        console.log('🎯 Auth Header:', request.headers.authorization); //************//
+        console.log('🎯 User ID:', request.userId); //************//
+        // ✅ Add validation //************//
+        if (!userId) {  //************//
+            return reply.status(401).send({ //************//
+                success: false, //************//
+                message: "Authentication required" //************//
+            }); //************//
+        } //************//
+
+        if (!targetUserId) { //************//
+            return reply.status(400).send({ //************//
+                success: false, //************//
+                message: "Target user ID is required" //************//
+            }); //************// 
+        } //************//
+
+        if (userId === targetUserId) { //************//
+            return reply.status(400).send({ //************//
+                success: false, //************//
+                message: "Cannot add yourself as a friend" //************//
+            }); //************//
+        } //************//
 
         const existing = await friendshipModel.getFriendship(userId, targetUserId);
         if (existing) {
-            reply.status(400).send({
+            return reply.status(400).send({
                 success: false,
-                message: "Friendship or request already exists.",
+                message: "Friendship or request already exists."
             });
-            return;
         }
 
         const friendship = await friendshipModel.createFriendRequest(userId, targetUserId);
@@ -29,7 +54,7 @@ async function addFriend(
         console.error(error);
         reply.status(500).send({
             success: false,
-            message: "Failed to add friend.",
+            message: "Failed to add friend."
         });
     }
 }
@@ -74,10 +99,14 @@ async function acceptFriend(
             // Use type assertion to access io property on server
             const io = (request.server as any).io;
             if (io) {
-                io.to(otherUserId).emit('friend-request-accepted', {
-                    friendId: userId,
-                    message: 'Your friend request was accepted!'
-                });
+              // ✅ Fetch sender name //************//
+              const currentUser = await userModel.findUserById(userId); //************//
+              const friendName = currentUser?.fullName || 'A friend'; //************//
+            
+              io.to(otherUserId).emit('friend-request-accepted', {
+                friendName: friendName, // ✅ Now frontend can use it
+                message: `${friendName} accepted your friend request!`
+              });
             }
         }
 

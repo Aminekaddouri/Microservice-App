@@ -1,9 +1,6 @@
 import { FastifyRequest, FastifyReply } from 'fastify';
+import { ClearConvParams } from '../types'; //*************//
 
-interface ClearConvParams {
-    id: string;
-    friendId: string;
-}
 
 export async function canClearConversation(
     request: FastifyRequest<{ Params: ClearConvParams }>,
