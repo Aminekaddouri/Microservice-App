@@ -1,0 +1,178 @@
+let 's build the User service first then move to Set up Nginx as API Gateway
+
+this the tree for the previous monolithic app that we got all the file need to run the the Auth-Service
+
+├── client
+│   ├── index.html
+│   ├── log.png
+│   ├── package.json
+│   ├── package-lock.json
+│   ├── postcss.config.ts
+│   ├── public
+│   │   ├── assets
+│   │   │   └── default-avatar.png
+│   │   └── notification.mp3
+│   ├── src
+│   │   ├── client.ts
+│   │   ├── components
+│   │   │   └── NotificationDropdown.ts
+│   │   ├── pages
+│   │   │   ├── ChatPage.ts
+│   │   │   ├── CheckYourEmailPage.ts
+│   │   │   ├── DashboardPage.ts
+│   │   │   ├── LoginPage.ts
+│   │   │   ├── SignupPage.ts
+│   │   │   ├── user-avatar.png
+│   │   │   └── VerifyEmailPage.ts
+│   │   ├── services
+│   │   │   ├── api.ts
+│   │   │   └── notificationService.ts
+│   │   ├── styles
+│   │   │   └── main.css
+│   │   ├── types
+│   │   │   ├── auth.ts
+│   │   │   ├── friendship.ts
+│   │   │   ├── message.ts
+│   │   │   ├── notitication.ts
+│   │   │   └── user.ts
+│   │   └── utils
+│   │       ├── authState.ts
+│   │       ├── auth.ts
+│   │       ├── router.ts
+│   │       └── utils.ts
+│   ├── tailwind.config.cjs
+│   ├── tsconfig.json
+│   └── vite.config.ts
+├── package.json
+├── package-lock.json
+├── README.md
+└── server
+    ├── nodemon.json
+    ├── package.json
+    ├── package-lock.json
+    ├── src
+    │   ├── controllers
+    │   │   ├── authController.ts
+    │   │   ├── friendshipController.ts
+    │   │   ├── messageController.ts
+    │   │   ├── notificationController.ts
+    │   │   └── userController.ts
+    │   ├── database
+    │   │   ├── db.ts
+    │   │   └── init-db.ts
+    │   ├── middlewares
+    │   │   ├── authenticate.ts
+    │   │   ├── canAccessUser.ts
+    │   │   ├── canClearConversation.ts
+    │   │   ├── canDeteleMsg.ts
+    │   │   ├── canSendMessage.ts
+    │   │   ├── canSendNotification.ts
+    │   │   ├── verifyReadMark.ts
+    │   │   └── verifyToken.ts
+    │   ├── models
+    │   │   ├── friendshipModel.ts
+    │   │   ├── messageModel.ts
+    │   │   ├── notificationModel.ts
+    │   │   ├── userModel.ts
+    │   │   └── verificationModel.ts
+    │   ├── routes
+    │   │   ├── authRoutes.ts
+    │   │   ├── friendshipRoutes.ts
+    │   │   ├── messageRoutes.ts
+    │   │   ├── notificationRouts.ts
+    │   │   └── userRoutes.ts
+    │   ├── server.ts
+    │   ├── socket
+    │   │   └── socketHandler.ts
+    │   ├── tools
+    │   │   └── tools.ts
+    │   └── types
+    │       └── fastify.d.ts
+    └── tsconfig.json
+
+what the files you need to build the User-service ?
+
+this all the routes i have for now
+
+// authRoutes.ts already used it 
+
+// userRoutes.ts
+
+import { FastifyInstance, FastifyPluginOptions } from 'fastify';
+import userController from '../controllers/userController';
+import { canAccessUser } from '../middlewares/canAccessUser';
+
+export default async function userRoutes(
+  fastify: FastifyInstance,
+  options: FastifyPluginOptions
+): Promise<void> {
+  fastify.get('/', userController.getAllUsers);
+  fastify.get('/:id', userController.getUserById);
+  fastify.put('/:id', { preHandler: canAccessUser }, userController.updateUser);
+  fastify.delete('/:id', { preHandler: canAccessUser }, userController.deleteUser);
+}
+
+// friendshipRoutes.ts
+
+import { FastifyInstance, FastifyPluginOptions } from "fastify";
+import networkController from "../controllers/friendshipController"
+import authenticate from "../middlewares/authenticate";
+
+async function userNetworkRoutes(
+    fastify: FastifyInstance,
+    options: FastifyPluginOptions,
+): Promise<void> {
+    fastify.get("/friend-list", networkController.getFriendList);
+    fastify.get("/pending-requests", networkController.getPendingRequests);
+    fastify.get("/block-list", networkController.getBlockList);
+
+    fastify.post("/add-friend", networkController.addFriend);
+    fastify.post("/accept-friend", networkController.acceptFriend);
+    fastify.post("/unblock-friend", networkController.unfriend);
+    fastify.post("/block-friend", networkController.blockFriend);
+    fastify.post('/accept', networkController.acceptFriend);
+    fastify.post('/reject', networkController.rejectFriend);
+
+
+}
+
+export default userNetworkRoutes;
+
+// messageRoutes.ts
+
+import { FastifyInstance, FastifyPluginOptions } from "fastify";
+import { canAccessUser } from "../middlewares/canAccessUser";
+import messageController from "../controllers/messageController";
+import { canDeleteMsg } from "../middlewares/canDeteleMsg";
+import { canSendMessage } from "../middlewares/canSendMessage";
+import { verifyReadMark } from "../middlewares/verifyReadMark";
+import { canClearConversation } from "../middlewares/canClearConversation";
+
+
+export async function messageRoutes(
+    fastify: FastifyInstance,
+    options: FastifyPluginOptions,
+): Promise<void> {
+    fastify.get('/:id/conv/:friendId', { preHandler: canAccessUser }, messageController.getConvMessages);
+    fastify.get('/:id/chat', { preHandler: canAccessUser }, messageController.getUserConversations);
+    fastify.post('/', { preHandler: canSendMessage }, messageController.sendMessage);
+    fastify.patch('/:msgId', { preHandler: verifyReadMark }, messageController.markMessageAsRead);
+    fastify.delete('/:msgId', { preHandler: canDeleteMsg }, messageController.deleteMessage);
+    fastify.delete('/:id/conv/:friendId/clear', { preHandler: canClearConversation }, messageController.clearConversation);
+    fastify.delete('/:id/conv/:friendId/clear-for-user', { preHandler: canAccessUser }, messageController.clearConversationForUser);
+}
+
+
+// notificationRouts.ts
+
+import { FastifyInstance, FastifyPluginOptions } from "fastify";
+import notificationController from "../controllers/notificationController";
+// import { canSendNotification } from "../middlewares/canSendNotification"; i remove this because if i need to set notification for add friend
+
+export async function notificationRoutes(
+    fastify: FastifyInstance,
+    options: FastifyPluginOptions,
+): Promise<void>{
+    fastify.post('/',  notificationController.sendNotification);
+    fastify.get('/me', notificationController.getNotifications);
+}

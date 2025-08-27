@@ -951,7 +951,11 @@ async function addFriend(friendId: string, buttonElement: HTMLElement) {
 
             // Send notification through API
             await sendFriendRequestNotification(friendId, friendName);
-
+            console.log('🎯 Adding friend with ID:', friendId);
+            if (!friendId) {
+              showModalNotification('error', 'Invalid user selected');
+              return;
+            }
             // Emit socket event for real-time alert
             socket.emit('send-friend-request', {
                 receiverId: friendId,

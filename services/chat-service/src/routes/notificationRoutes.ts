@@ -1,21 +1,57 @@
-import { FastifyInstance, RouteGenericInterface } from 'fastify';
+import { FastifyPluginOptions, FastifyInstance, RouteGenericInterface } from 'fastify';
+import notificationController from '../controllers/notificationController';
 import { authenticate } from '../middlewares/authenticate';
-import { getNotificationsHandler, sendNotificationHandler, clearAllNotificationsHandler } from '../controllers/notificationController';
 
+// Define route types
 interface SendNotification extends RouteGenericInterface {
-  Body: { content: string; type: string; receiversIds: string[] };
+  Body: {
+    content: string;
+    type: string;
+    receiversIds: string[];
+  };
 }
 
 interface GetNotifications extends RouteGenericInterface {
-  // No body
+  // No body, just auth
 }
 
 interface ClearAllNotifications extends RouteGenericInterface {
   // No body
 }
 
-export default async function notificationRoutes(fastify: FastifyInstance) {
-  fastify.get<GetNotifications>('/me', { preHandler: authenticate }, getNotificationsHandler);
-  fastify.post<SendNotification>('/', { preHandler: authenticate }, sendNotificationHandler);
-  fastify.delete<ClearAllNotifications>('/clear-all', { preHandler: authenticate }, clearAllNotificationsHandler);
+interface DeleteNotification extends RouteGenericInterface {
+  Params: {
+    id: string;
+  };
 }
+
+async function notificationRoutes(
+  fastify: FastifyInstance,
+  options: FastifyPluginOptions,
+): Promise<void> {
+  fastify.post<SendNotification>(
+    '/',
+    { preHandler: authenticate },
+    notificationController.sendNotification
+  );
+
+  fastify.get<GetNotifications>(
+    '/me',
+    { preHandler: authenticate },
+    notificationController.getNotifications
+  );
+
+  fastify.delete<ClearAllNotifications>(
+    '/clear-all',
+    { preHandler: authenticate },
+    notificationController.clearAllNotifications
+  );
+
+  fastify.delete<DeleteNotification>(
+    '/:id',
+    { preHandler: authenticate },
+    notificationController.deleteNotification
+  );
+}
+
+export default notificationRoutes;

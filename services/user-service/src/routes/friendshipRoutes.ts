@@ -2,8 +2,24 @@ import { FastifyInstance, FastifyPluginOptions, RouteGenericInterface } from "fa
 import networkController from "../controllers/friendshipController";
 import authenticate from "../middlewares/authenticate";
 
-// Define the route type //*************//
+// Define route types
 interface AddFriendRoute extends RouteGenericInterface {
+  Body: { targetUserId: string };
+}
+
+interface AcceptFriendRoute extends RouteGenericInterface {
+  Body: { targetUserId?: string; friendshipId?: string };
+}
+
+interface RejectFriendRoute extends RouteGenericInterface {
+  Body: { targetUserId?: string; friendshipId?: string };
+}
+
+interface BlockFriendRoute extends RouteGenericInterface {
+  Body: { targetUserId: string };
+}
+
+interface UnblockFriendRoute extends RouteGenericInterface {
   Body: { targetUserId: string };
 }
 
@@ -11,24 +27,53 @@ async function userNetworkRoutes(
   fastify: FastifyInstance,
   options: FastifyPluginOptions,
 ): Promise<void> {
-  fastify.get("/friend-list", networkController.getFriendList);
-  fastify.get("/pending-requests", networkController.getPendingRequests);
-  fastify.get("/block-list", networkController.getBlockList);
+  fastify.get("/friend-list", { preHandler: authenticate }, networkController.getFriendList);
+  fastify.get("/pending-requests", { preHandler: authenticate }, networkController.getPendingRequests);
+  fastify.get("/block-list", { preHandler: authenticate }, networkController.getBlockList);
 
-  // ✅ Add generic to specify body type //***************//
+  // ✅ Already correct
   fastify.post<AddFriendRoute>(
     '/add-friend',
     { preHandler: authenticate },
     networkController.addFriend
   );
 
-  fastify.post("/accept-friend", networkController.acceptFriend);
-  fastify.post("/unblock-friend", networkController.unfriend);
-  fastify.post("/block-friend", networkController.blockFriend);
-  fastify.post('/accept', networkController.acceptFriend);
-  fastify.post('/reject', networkController.rejectFriend);
+  // ✅ Fix: Add generic
+  fastify.post<AcceptFriendRoute>(
+    '/accept-friend',
+    { preHandler: authenticate },
+    networkController.acceptFriend
+  );
 
-  // Fix: Add preHandler to /status route //*************//
+  // ✅ Fix: Add generic
+  fastify.post<UnblockFriendRoute>(
+    '/unblock-friend',
+    { preHandler: authenticate },
+    networkController.unfriend
+  );
+
+  // ✅ Fix: Add generic
+  fastify.post<BlockFriendRoute>(
+    '/block-friend',
+    { preHandler: authenticate },
+    networkController.blockFriend
+  );
+
+  // ✅ Fix: Add generic
+  fastify.post<AcceptFriendRoute>(
+    '/accept',
+    { preHandler: authenticate },
+    networkController.acceptFriend
+  );
+
+  // ✅ Fix: Add generic
+  fastify.post<RejectFriendRoute>(
+    '/reject',
+    { preHandler: authenticate },
+    networkController.rejectFriend
+  );
+
+  // ✅ Already correct
   fastify.get<{ Params: { userId: string; targetId: string } }>(
     '/:userId/:targetId/status',
     { preHandler: authenticate },

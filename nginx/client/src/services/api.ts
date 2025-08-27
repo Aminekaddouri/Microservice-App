@@ -179,7 +179,7 @@ class ApiClient {
         return this.request<NotificationResponse>('notifications/me');
     }
     async sendNotification(content: string, type: string, receiversIds: string[]): Promise<NotificationResponse> {
-        return this.request<NotificationResponse>('notifications/', {
+        return this.request<NotificationResponse>('notifications/', { //*********************/
             method: 'POST',
             body: JSON.stringify({ content, type, receiversIds })
         });

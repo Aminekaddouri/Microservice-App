@@ -24,8 +24,8 @@ export async function authenticate(
     const JWT_SECRET = process.env.JWT_SECRET;
     if (!JWT_SECRET) throw new Error('JWT_SECRET not defined');
 
-    const decoded = jwt.verify(token, JWT_SECRET) as any;
-    request.userId = decoded.id || decoded.id;
+    const decoded = jwt.verify(token, JWT_SECRET) as { id: string };
+    request.userId = decoded.id;
 
     console.log(`🔐 Authenticated user: ${request.userId}`);
   } catch (error) {
