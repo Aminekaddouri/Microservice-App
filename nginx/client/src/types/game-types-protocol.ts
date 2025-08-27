@@ -16,6 +16,6 @@ export interface StatePayload {
 
 export const gameWorldDimensions = {
   gameD: { w: 1, h: 1 },
-  paddle: { w: 0.015, h: 0.3 },
+  paddle: { w: 0.015, h: 0.25 },
   ball: { w: 0.03 }
 }

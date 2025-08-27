@@ -19,32 +19,32 @@ services:
   # 👥 User Service
   # Handles: profiles, friendships
   # -----------------------------
-  user-service:
-    build: ./services/user-service
-    env_file:
-      - ./services/user-service/.env
-    volumes:
-      - user-data:/app/data
-    ports:
-     - "3002:3002"
-    networks:
-      - ft_net
+  # user-service:
+  #   build: ./services/user-service
+  #   env_file:
+  #     - ./services/user-service/.env
+  #   volumes:
+  #     - user-data:/app/data
+  #   ports:
+  #    - "3002:3002"
+  #   networks:
+  #     - ft_net
 
   # -----------------------------
   # Chat Service
   # -----------------------------
-  chat-service:
-    build: ./services/chat-service
-    env_file:
-      - ./services/chat-service/.env
-    depends_on:
-      - user-service
-    volumes:
-      - chat-data:/app/data
-    ports:
-     - "3003:3003"
-    networks:
-      - ft_net
+  # chat-service:
+  #   build: ./services/chat-service
+  #   env_file:
+  #     - ./services/chat-service/.env
+  #   depends_on:
+  #     - user-service
+  #   volumes:
+  #     - chat-data:/app/data
+  #   ports:
+  #    - "3003:3003"
+  #   networks:
+  #     - ft_net
 
   # -----------------------------
   # 🌐 Nginx API Gateway + Frontend
@@ -57,8 +57,8 @@ services:
       # - "443:443"  # Uncomment when using SSL
     depends_on:
       - auth-service
-      - user-service
-      - chat-service
+      # - user-service
+      # - chat-service
     networks:
       - ft_net
 
@@ -68,5 +68,5 @@ networks:
 
 volumes:
   auth-data:
-  user-data:
-  chat-data:
+  # user-data:
+  # chat-data:

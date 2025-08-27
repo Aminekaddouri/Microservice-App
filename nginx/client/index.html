@@ -2,14 +2,39 @@
 <html lang="en">
 
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Vite + TS + Tailwind</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ft_Pong</title>
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css?family=Poppins:500,700&display=swap" rel="stylesheet" />
+
+  <!-- Tailwind CSS via CDN (for now) -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            poppins: ['Poppins', 'sans-serif'],
+          },
+        },
+      },
+    };
+  </script>
 </head>
 
 <body>
-  <div id="app"></div>
+  <!-- Root container; the app shell (sidebar/topbar) will be injected here only after login -->
+  <div id="root">
+    <!-- A minimal app container for public routes like /login and /signup -->
+    <div id="app"></div>
+  </div>
+
+  <!-- Your TypeScript App -->
   <script type="module" src="/src/client.ts"></script>
+
+  <!-- Google Identity Services -->
   <script src="https://accounts.google.com/gsi/client" async defer></script>
 </body>
 

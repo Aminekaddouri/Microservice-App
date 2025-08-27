@@ -14,6 +14,10 @@ export type User = {
     picture: string;
     password: string | null;
     verified?: boolean;
+    isGoogleUser?: boolean;
+    twoFactorEnabled?: boolean;
+    twoFactorSecret?: string | null;
+    twoFactorBackupCodes?: string | null;
     joinedAt?: string;
 };
 
@@ -26,8 +30,8 @@ async function registerUser(user: Omit<User, 'id'  | 'joinedAt'>): Promise<User>
     const joinedAt = new Date().toISOString();
 
     await db.run(
-        `INSERT INTO user (id, fullName, nickName, email, picture, password, verified, joinedAt)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+        `INSERT INTO User (id, fullName, nickName, email, picture, password, verified, isGoogleUser, joinedAt)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
         [
             id,
             user.fullName,
@@ -36,13 +40,14 @@ async function registerUser(user: Omit<User, 'id'  | 'joinedAt'>): Promise<User>
             user.picture,
             hashedPassword,
             user.verified || false,
+            user.isGoogleUser || false,
             joinedAt
         ]
     );
 
     return {
-        id,
         ...user,
+        id,
         password: hashedPassword,
         joinedAt,
     };

@@ -63,6 +63,7 @@ export class NotificationDropdown {
     private async loadNotifications(dropdown: HTMLElement) {
         try {
             const response = await api.getNotifications();
+            console.log("Fetched notifications:", response);
             const notificationList = dropdown.querySelector(`#${this.dropdownId}-list`) as HTMLElement;
 
             if (notificationList) {

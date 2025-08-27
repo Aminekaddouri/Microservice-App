@@ -1,5 +1,5 @@
 export interface User {
-    id: string;
+    id?: string;
     fullName: string;
     nickName: string;
     email: string;
@@ -7,9 +7,14 @@ export interface User {
     picture: string;
     verified?: boolean;
     joinedAt?: string;
+    isGoogleUser?: boolean;
+    twoFactorEnabled?: boolean;
+    twoFactorSecret?: string;
+    twoFactorBackupCodes?: string;
 }
 
 export type UserResponse = {
+    id(id: any): unknown;
     success: boolean;
     user?: User;
     message?: string;

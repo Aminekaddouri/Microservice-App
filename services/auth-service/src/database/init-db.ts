@@ -11,6 +11,10 @@ db.exec(`
     picture TEXT NOT NULL,
     password TEXT,
     verified BOOLEAN DEFAULT FALSE,
+    isGoogleUser BOOLEAN DEFAULT FALSE,
+    twoFactorEnabled BOOLEAN DEFAULT FALSE,
+    twoFactorSecret TEXT,
+    twoFactorBackupCodes TEXT,
     joinedAt DATETIME DEFAULT CURRENT_TIMESTAMP
   );
 

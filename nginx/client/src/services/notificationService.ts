@@ -254,65 +254,128 @@ export class NotificationService {
     }
 
     /**
-     * Updates the notification badge in the sidebar
+     * Updates the notification badge in the sidebar with modern design
      */
     updateSidebarNotificationBadge() {
         const notificationToggle = document.getElementById('notification-toggle-sidebar');
         if (!notificationToggle) return;
 
-        const existingBadge = notificationToggle.querySelector('.animate-bounce');
-        if (existingBadge) {
-            existingBadge.remove();
-        }
+        // Remove existing badges
+        const existingBadges = notificationToggle.querySelectorAll('.notification-badge, .animate-bounce');
+        existingBadges.forEach(badge => badge.remove());
 
         if (totalNotifications > 0) {
             const badge = document.createElement('div');
-            badge.className = 'absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center animate-bounce';
+            badge.className = 'notification-badge absolute -top-1.5 -right-1.5 min-w-[1.25rem] h-5 px-1.5 flex items-center justify-center text-[10px] font-bold text-white rounded-full shadow-lg transform transition-all duration-300 animate-pulse';
+            
+            // Enhanced gradient background based on notification count
+            if (totalNotifications >= 10) {
+                badge.classList.add('bg-gradient-to-r', 'from-red-500', 'to-pink-500', 'animate-bounce');
+            } else if (totalNotifications >= 5) {
+                badge.classList.add('bg-gradient-to-r', 'from-orange-500', 'to-red-500');
+            } else {
+                badge.classList.add('bg-gradient-to-r', 'from-orange-400', 'to-orange-600');
+            }
+            
+            // Add glow effect for high priority notifications
+            if (totalNotifications >= 5) {
+                badge.style.boxShadow = '0 0 12px rgba(239, 68, 68, 0.6), 0 0 24px rgba(239, 68, 68, 0.3)';
+            }
+            
             badge.textContent = totalNotifications > 99 ? '99+' : totalNotifications.toString();
+            
+            // Add entrance animation
+            badge.style.transform = 'scale(0)';
             notificationToggle.appendChild(badge);
-            console.log("notification-toggle-sidebar", notificationToggle);
+            
+            // Trigger entrance animation
+            requestAnimationFrame(() => {
+                badge.style.transform = 'scale(1)';
+            });
+            
+            console.log("Enhanced notification badge updated:", notificationToggle);
         }
     }
 
     /**
-     * Shows friend request alert modal
+     * Shows enhanced friend request alert modal with modern design
      */
-    showFriendRequestAlert(request: FriendRequest) {
+    showFriendRequestAlert(request: FriendRequest, notificationId: string) {
         const existingAlert = document.getElementById('friend-request-alert');
         if (existingAlert) existingAlert.remove();
 
         const modal = document.createElement('div');
         modal.id = 'friend-request-alert';
-        modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[100]';
+        modal.className = 'fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[100] animate-in fade-in duration-300';
 
         modal.innerHTML = `
-            <div class="bg-white rounded-lg p-6 max-w-md w-full mx-4 shadow-xl animate-bounce">
-                <div class="text-center">
-                    <div class="mb-4">
-                        <img src="${request.senderPicture || 'user-avatar.png'}" 
-                             alt="${request.senderName}" 
-                             class="w-20 h-20 rounded-full mx-auto border-4 border-blue-500 shadow-lg">
+            <div class="relative bg-gradient-to-br from-white/95 via-white/90 to-white/85 backdrop-blur-xl rounded-3xl p-8 max-w-md w-full mx-4 shadow-2xl border border-white/30 transform transition-all duration-300 scale-95 hover:scale-100">
+                <!-- Gradient overlay for glass effect -->
+                <div class="absolute inset-0 bg-gradient-to-br from-orange-500/10 via-transparent to-blue-500/10 rounded-3xl pointer-events-none"></div>
+                
+                <div class="relative text-center">
+                    <!-- Enhanced profile image section -->
+                    <div class="mb-6">
+                        <div class="relative inline-block">
+                            <div class="absolute inset-0 bg-gradient-to-r from-orange-400 to-red-400 rounded-full blur-lg opacity-75 animate-pulse"></div>
+                            <img src="${request.senderPicture || 'user-avatar.png'}" 
+                                 alt="${request.senderName}" 
+                                 class="relative w-24 h-24 rounded-full mx-auto border-4 border-white/50 shadow-xl object-cover"
+                                 onerror="this.src='/default-avatar.png'">
+                            <!-- Friend request icon -->
+                            <div class="absolute -bottom-2 -right-2 bg-gradient-to-r from-orange-500 to-red-500 p-2 rounded-full border-2 border-white shadow-lg">
+                                <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"/>
+                                </svg>
+                            </div>
+                        </div>
                     </div>
                     
-                    <h3 class="text-2xl font-bold text-gray-800 mb-2">🤝 Friend Request!</h3>
-                    <p class="text-gray-600 mb-6 text-lg">
-                        <strong class="text-blue-600">${request.senderName}</strong> wants to be your friend!
-                    </p>
+                    <!-- Enhanced header -->
+                    <div class="mb-6">
+                        <h3 class="text-2xl font-bold bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent mb-2">🤝 Friend Request!</h3>
+                        <p class="text-gray-600 text-lg leading-relaxed">
+                            <strong class="text-orange-600 font-semibold">${request.senderName}</strong> wants to connect with you!
+                        </p>
+                        <div class="mt-2 inline-flex items-center px-3 py-1 bg-orange-100/50 rounded-full">
+                            <div class="w-2 h-2 bg-green-500 rounded-full mr-2 animate-pulse"></div>
+                            <span class="text-xs font-medium text-gray-600">New Request</span>
+                        </div>
+                    </div>
                     
-                    <div class="flex space-x-3 mb-4">
+                    <!-- Enhanced action buttons -->
+                    <div class="flex space-x-3 mb-6">
                         <button id="accept-request" 
-                                class="flex-1 bg-green-600 text-white py-3 px-4 rounded-lg hover:bg-green-700 transition duration-200 font-semibold">
-                            ✓ Accept
+                                class="group flex-1 relative overflow-hidden bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white py-3.5 px-4 rounded-2xl font-semibold transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-green-500/50">
+                            <span class="relative z-10 flex items-center justify-center space-x-2">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                </svg>
+                                <span>Accept</span>
+                            </span>
+                            <div class="absolute inset-0 -translate-x-full group-hover:translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent transition-transform duration-700 ease-out"></div>
                         </button>
                         <button id="reject-request" 
-                                class="flex-1 bg-red-600 text-white py-3 px-4 rounded-lg hover:bg-red-700 transition duration-200 font-semibold">
-                            ✗ Reject
+                                class="group flex-1 relative overflow-hidden bg-gradient-to-r from-red-500 to-pink-600 hover:from-red-600 hover:to-pink-700 text-white py-3.5 px-4 rounded-2xl font-semibold transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-red-500/50">
+                            <span class="relative z-10 flex items-center justify-center space-x-2">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                </svg>
+                                <span>Decline</span>
+                            </span>
+                            <div class="absolute inset-0 -translate-x-full group-hover:translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent transition-transform duration-700 ease-out"></div>
                         </button>
                     </div>
                     
+                    <!-- Enhanced decide later button -->
                     <button id="close-alert" 
-                            class="text-gray-500 hover:text-gray-700 text-sm underline">
-                        Decide Later
+                            class="group text-gray-500 hover:text-gray-700 text-sm font-medium transition-all duration-200 hover:bg-gray-100/50 px-4 py-2 rounded-xl">
+                        <span class="flex items-center space-x-1">
+                            <svg class="w-4 h-4 group-hover:rotate-90 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                            <span>Decide Later</span>
+                        </span>
                     </button>
                 </div>
             </div>
@@ -322,12 +385,12 @@ export class NotificationService {
 
         // Add event listeners
         document.getElementById('accept-request')?.addEventListener('click', async () => {
-            await this.handleFriendRequestResponse(request.id, 'accept', request.senderName);
+            await this.handleFriendRequestResponse(request.id, 'accept', request.senderName, notificationId);
             modal.remove();
         });
 
         document.getElementById('reject-request')?.addEventListener('click', async () => {
-            await this.handleFriendRequestResponse(request.id, 'reject', request.senderName);
+            await this.handleFriendRequestResponse(request.id, 'reject', request.senderName, notificationId);
             modal.remove();
         });
 
@@ -345,11 +408,15 @@ export class NotificationService {
     /**
      * Handles friend request response
      */
-    async handleFriendRequestResponse(requestId: string, action: 'accept' | 'reject', senderName: string) {
+    async handleFriendRequestResponse(requestId: string, action: 'accept' | 'reject', senderName: string, notificationId: string) {
         try {
             let response;
 
             if (action === 'accept') {
+                console.log("Accepting friend request with ID:", requestId);
+                if (!requestId) {
+                    throw new Error("Friendship ID is required to accept a friend request.");
+                }
                 response = await api.acceptFriendRequest(requestId);
                 if (response.success) {
                     this.showModalNotification('success', `✅ You are now friends with ${senderName}! 🎉`);
@@ -366,6 +433,12 @@ export class NotificationService {
 
             if (!response.success) {
                 this.showModalNotification('error', response.message || 'Failed to process friend request.');
+            }
+            try {
+                console.log("######################################, ",notificationId);
+                await api.deleteNotification(notificationId);
+            } catch (error) {
+                console.error('Error clearing notifications:', error);
             }
         } catch (error) {
             console.error('Error handling friend request:', error);
@@ -394,47 +467,102 @@ export class NotificationService {
     }
 
     /**
-     * Shows modal notification with styling
+     * Shows enhanced modal notification with modern design
      */
     showModalNotification(type: 'success' | 'error' | 'info' | 'warning', message: string) {
-        // Create a temporary notification if modal elements don't exist
+        // Create enhanced notification with modern styling
         const tempNotification = document.createElement('div');
-        tempNotification.className = `fixed top-4 right-4 p-4 rounded-lg shadow-lg z-[200] transition-all duration-300`;
+        tempNotification.className = `fixed top-6 right-6 max-w-sm w-full p-4 rounded-2xl shadow-2xl z-[200] transition-all duration-500 transform backdrop-blur-xl border border-white/20`;
 
-        let bgColor, textColor, icon;
+        let bgGradient, textColor, iconSvg, glowEffect;
         switch (type) {
             case 'success':
-                bgColor = 'bg-green-100 border border-green-400';
-                textColor = 'text-green-800';
-                icon = '✅';
+                bgGradient = 'bg-gradient-to-r from-green-500/90 to-emerald-600/90';
+                textColor = 'text-white';
+                glowEffect = '0 0 20px rgba(34, 197, 94, 0.4)';
+                iconSvg = `
+                    <div class="flex-shrink-0 w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
+                        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                        </svg>
+                    </div>
+                `;
                 break;
             case 'error':
-                bgColor = 'bg-red-100 border border-red-400';
-                textColor = 'text-red-800';
-                icon = '❌';
+                bgGradient = 'bg-gradient-to-r from-red-500/90 to-pink-600/90';
+                textColor = 'text-white';
+                glowEffect = '0 0 20px rgba(239, 68, 68, 0.4)';
+                iconSvg = `
+                    <div class="flex-shrink-0 w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
+                        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
+                    </div>
+                `;
                 break;
             case 'warning':
-                bgColor = 'bg-yellow-100 border border-yellow-400';
-                textColor = 'text-yellow-800';
-                icon = '⚠️';
+                bgGradient = 'bg-gradient-to-r from-yellow-500/90 to-orange-600/90';
+                textColor = 'text-white';
+                glowEffect = '0 0 20px rgba(245, 158, 11, 0.4)';
+                iconSvg = `
+                    <div class="flex-shrink-0 w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
+                        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16c-.77.833.192 2.5 1.732 2.5z"/>
+                        </svg>
+                    </div>
+                `;
                 break;
             case 'info':
             default:
-                bgColor = 'bg-blue-100 border border-blue-400';
-                textColor = 'text-blue-800';
-                icon = 'ℹ️';
+                bgGradient = 'bg-gradient-to-r from-blue-500/90 to-indigo-600/90';
+                textColor = 'text-white';
+                glowEffect = '0 0 20px rgba(59, 130, 246, 0.4)';
+                iconSvg = `
+                    <div class="flex-shrink-0 w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
+                        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                    </div>
+                `;
                 break;
         }
 
-        tempNotification.className += ` ${bgColor} ${textColor}`;
+        tempNotification.className += ` ${bgGradient} ${textColor}`;
+        tempNotification.style.boxShadow = glowEffect;
+        
         tempNotification.innerHTML = `
-            <div class="flex items-center space-x-2">
-                <span>${icon}</span>
-                <span class="text-sm font-medium">${message}</span>
+            <div class="flex items-start space-x-3">
+                ${iconSvg}
+                <div class="flex-1 min-w-0">
+                    <p class="text-sm font-semibold leading-relaxed">${message}</p>
+                </div>
+                <button class="notification-close flex-shrink-0 text-white/70 hover:text-white transition-colors duration-200">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
             </div>
         `;
 
+        // Add entrance animation
+        tempNotification.style.transform = 'translateX(100%) scale(0.8)';
+        tempNotification.style.opacity = '0';
+        
         document.body.appendChild(tempNotification);
+        
+        // Trigger entrance animation
+        requestAnimationFrame(() => {
+            tempNotification.style.transform = 'translateX(0) scale(1)';
+            tempNotification.style.opacity = '1';
+        });
+        
+        // Add close button functionality
+        const closeBtn = tempNotification.querySelector('.notification-close');
+        closeBtn?.addEventListener('click', () => {
+            tempNotification.style.transform = 'translateX(100%) scale(0.8)';
+            tempNotification.style.opacity = '0';
+            setTimeout(() => tempNotification.remove(), 300);
+        });
 
         // Auto-remove after 5 seconds
         setTimeout(() => {

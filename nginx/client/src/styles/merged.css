@@ -1,0 +1,490 @@
+/* Essential Global Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* Prevent body scrolling - all scrolling within container */
+html, body {
+    height: 100%;
+    overflow: hidden;
+    position: fixed;
+    width: 100%;
+}
+
+/* Ensure root container takes full height */
+#root {
+    height: 100vh;
+    overflow: hidden;
+}
+
+/* Glass Card Base Style - Used by dashboard components */
+.glass-card {
+    position: relative;
+    backdrop-filter: blur(16px);
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 24px;
+    padding: 2rem;
+    box-shadow: 
+        0 8px 32px rgba(0, 0, 0, 0.1),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    transition: all 0.3s ease;
+    overflow: hidden;
+}
+
+.glass-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+}
+
+.glass-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 
+        0 12px 40px rgba(0, 0, 0, 0.15),
+        inset 0 1px 0 rgba(255, 255, 255, 0.3);
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+/* Win Rate Circle - Used by dashboard components */
+.win-rate-circle {
+    position: relative;
+    width: 120px;
+    height: 120px;
+}
+
+.win-rate-circle svg {
+    width: 100%;
+    height: 100%;
+    transform: rotate(-90deg);
+}
+
+.win-rate-circle .bg-circle {
+    fill: none;
+    stroke: rgba(255, 255, 255, 0.1);
+    stroke-width: 8;
+}
+
+.win-rate-circle .progress-circle {
+    fill: none;
+    stroke: url(#winRateGradient);
+    stroke-width: 8;
+    stroke-linecap: round;
+    transition: stroke-dasharray 1s ease;
+}
+
+/* Reduced Motion Preferences */
+@media (prefers-reduced-motion: reduce) {
+    .glass-card {
+        transition: none;
+    }
+    
+    .win-rate-circle .progress-circle {
+        transition: none;
+    }
+}
+
+
+
+
+
+
+
+
+    /* ========== ULTIMATE SCROLLBAR DESIGN ========== */
+
+    /* Universal scrollbar container - contained within app container */
+    #app,
+    #app *,
+    .chat-container,
+    #user-list,
+    #search-results,
+    .message-area,
+    #games-list,
+    #session-cards {
+        scrollbar-width: thin;
+        /* Firefox: thin scrollbar */
+        scrollbar-color: rgba(255, 255, 255, 0.3) rgba(255, 255, 255, 0.1);
+        /* thumb color, track color */
+    }
+
+    /* WebKit browsers (Chrome, Edge, Safari) */
+    #app::-webkit-scrollbar,
+    #app *::-webkit-scrollbar,
+    .chat-container::-webkit-scrollbar,
+    #user-list::-webkit-scrollbar,
+    #search-results::-webkit-scrollbar,
+    .message-area::-webkit-scrollbar,
+    #games-list::-webkit-scrollbar,
+    #session-cards::-webkit-scrollbar {
+        width: 8px;
+        /* Thin vertical scrollbar */
+        height: 8px;
+        /* For horizontal (optional) */
+    }
+
+    /* Scrollbar track - background */
+    #app::-webkit-scrollbar-track,
+    #app *::-webkit-scrollbar-track,
+    .chat-container::-webkit-scrollbar-track,
+    #user-list::-webkit-scrollbar-track,
+    #search-results::-webkit-scrollbar-track,
+    .message-area::-webkit-scrollbar-track,
+    #games-list::-webkit-scrollbar-track,
+    #session-cards::-webkit-scrollbar-track {
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 10px;
+        margin-block: 4px;
+        /* Prevents touching top/bottom */
+    }
+
+    /* Scrollbar thumb - draggable part */
+    #app::-webkit-scrollbar-thumb,
+    #app *::-webkit-scrollbar-thumb,
+    .chat-container::-webkit-scrollbar-thumb,
+    #user-list::-webkit-scrollbar-thumb,
+    #search-results::-webkit-scrollbar-thumb,
+    .message-area::-webkit-scrollbar-thumb,
+    #games-list::-webkit-scrollbar-thumb,
+    #session-cards::-webkit-scrollbar-thumb {
+        background: linear-gradient(to bottom,
+                rgba(255, 255, 255, 0.3),
+                rgba(255, 255, 255, 0.5));
+        border-radius: 10px;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+        transition: all 0.2s ease;
+    }
+
+    /* Hover state - elegant glow */
+    #app::-webkit-scrollbar-thumb:hover,
+    #app *::-webkit-scrollbar-thumb:hover,
+    .chat-container::-webkit-scrollbar-thumb:hover,
+    .message-area::-webkit-scrollbar-thumb:hover,
+    #user-list::-webkit-scrollbar-thumb:hover {
+        background: linear-gradient(to bottom,
+                rgba(255, 255, 255, 0.5),
+                rgba(255, 255, 255, 0.7));
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        box-shadow: 0 1px 8px rgba(0, 0, 0, 0.3);
+        transform: scale(1.05);
+    }
+
+    /* Active (drag) state */
+    #app::-webkit-scrollbar-thumb:active,
+    #app *::-webkit-scrollbar-thumb:active,
+    .chat-container::-webkit-scrollbar-thumb:active {
+        background: linear-gradient(to bottom,
+                rgba(255, 255, 255, 0.6),
+                rgba(255, 255, 255, 0.8));
+        transform: scale(1.1);
+    }
+
+    /* Optional: Corner (where scrollbars meet) */
+    #app::-webkit-scrollbar-corner,
+    #app *::-webkit-scrollbar-corner,
+    .chat-container::-webkit-scrollbar-corner {
+        background: transparent;
+    }
+
+/* ========== TOURNAMENT STYLES ========== */
+
+/* Tournament Match Notification */
+.tournament-match-notification {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 60vh;
+    padding: 2rem;
+}
+
+.tournament-match-card {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.05));
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 24px;
+    padding: 3rem 2rem;
+    text-align: center;
+    box-shadow: 
+        0 20px 40px rgba(0, 0, 0, 0.1),
+        inset 0 1px 0 rgba(255, 255, 255, 0.3);
+    max-width: 400px;
+    width: 100%;
+    animation: slideInUp 0.6s ease-out;
+}
+
+.tournament-match-icon {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+    animation: bounce 2s infinite;
+}
+
+.tournament-match-title {
+    color: #ff6b35;
+    font-size: 2rem;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.tournament-match-message {
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 1.1rem;
+    margin-bottom: 2rem;
+    font-weight: 500;
+}
+
+.tournament-match-loader {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+}
+
+.tournament-match-loader p {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.9rem;
+}
+
+/* Tournament Proposal */
+.tournament-proposal {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 60vh;
+    padding: 2rem;
+}
+
+.tournament-proposal-card {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.05));
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 24px;
+    padding: 3rem 2rem;
+    text-align: center;
+    box-shadow: 
+        0 20px 40px rgba(0, 0, 0, 0.1),
+        inset 0 1px 0 rgba(255, 255, 255, 0.3);
+    max-width: 450px;
+    width: 100%;
+    animation: slideInUp 0.6s ease-out;
+}
+
+.tournament-proposal-icon {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+    animation: pulse 2s infinite;
+}
+
+.tournament-proposal-title {
+    color: #ff6b35;
+    font-size: 2rem;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.tournament-proposal-message {
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 1.1rem;
+    margin-bottom: 2rem;
+    font-weight: 500;
+}
+
+.tournament-proposal-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.btn-accept, .btn-decline {
+    padding: 0.75rem 2rem;
+    border: none;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    min-width: 120px;
+}
+
+.btn-accept {
+    background: linear-gradient(135deg, #4ade80, #22c55e);
+    color: white;
+    box-shadow: 0 4px 15px rgba(34, 197, 94, 0.3);
+}
+
+.btn-accept:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(34, 197, 94, 0.4);
+    background: linear-gradient(135deg, #22c55e, #16a34a);
+}
+
+.btn-decline {
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+    color: white;
+    box-shadow: 0 4px 15px rgba(220, 38, 38, 0.3);
+}
+
+.btn-decline:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(220, 38, 38, 0.4);
+    background: linear-gradient(135deg, #dc2626, #b91c1c);
+}
+
+/* Tournament Waiting */
+.tournament-waiting {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 60vh;
+    padding: 2rem;
+}
+
+.tournament-waiting-card {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.05));
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 24px;
+    padding: 3rem 2rem;
+    text-align: center;
+    box-shadow: 
+        0 20px 40px rgba(0, 0, 0, 0.1),
+        inset 0 1px 0 rgba(255, 255, 255, 0.3);
+    max-width: 400px;
+    width: 100%;
+    animation: slideInUp 0.6s ease-out;
+}
+
+.tournament-waiting-card h2 {
+    color: #4ade80;
+    font-size: 1.8rem;
+    font-weight: bold;
+    margin: 1rem 0 0.5rem 0;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.tournament-waiting-card p {
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 1rem;
+    font-weight: 500;
+}
+
+/* Tournament Ready */
+.tournament-ready {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 60vh;
+    padding: 2rem;
+    text-align: center;
+    color: #4ade80;
+    font-size: 2rem;
+    font-weight: bold;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* General Tournament Message */
+.tournament-message {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 40vh;
+    padding: 2rem;
+    text-align: center;
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 1.2rem;
+    font-weight: 500;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 16px;
+    margin: 2rem;
+}
+
+/* Spinner Animation */
+.spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid rgba(255, 255, 255, 0.3);
+    border-top: 4px solid #ff6b35;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto;
+}
+
+/* Animations */
+@keyframes slideInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes bounce {
+    0%, 20%, 50%, 80%, 100% {
+        transform: translateY(0);
+    }
+    40% {
+        transform: translateY(-10px);
+    }
+    60% {
+        transform: translateY(-5px);
+    }
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.1);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .tournament-match-card,
+    .tournament-proposal-card,
+    .tournament-waiting-card {
+        padding: 2rem 1.5rem;
+        margin: 1rem;
+    }
+    
+    .tournament-match-title,
+    .tournament-proposal-title {
+        font-size: 1.5rem;
+    }
+    
+    .tournament-proposal-actions {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .btn-accept, .btn-decline {
+        width: 100%;
+        max-width: 200px;
+    }
+}

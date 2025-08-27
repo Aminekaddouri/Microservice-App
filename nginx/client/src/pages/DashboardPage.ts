@@ -1,48 +1,62 @@
-import { loadingIndicator, showToast } from '@/utils/utils';
-import { logout, isLoggedIn, getAccessToken, getRefreshToken } from '../utils/auth';
+import { isLoggedIn } from '../utils/auth';
 import { navigateTo } from '../utils/router';
 import { checkEmailVerification } from './LoginPage';
 import { getCurrentUser } from '@/utils/authState';
+import { loadingIndicator } from '@/utils/utils';
+import { isEmailVerificationChecked, setEmailVerificationChecked, getCachedVerificationStatus } from '../utils/auth';
+import { DashboardConfig, DashboardConfigBuilder, defaultConfig } from './dashboard/DashboardConfig';
+import { DashboardManager } from './dashboard/DashboardManager';
 
-export async function renderDashboard() {
+// Main render function
+export async function renderDashboard(customConfig: Partial<DashboardConfig> = {}) {
   if (!isLoggedIn()) {
-    navigateTo('/');
+    if (location.pathname !== '/login') {
+      navigateTo('/login');
+    }
     return;
   }
 
   const app = document.getElementById("app");
   if (!app) return;
-  app.innerHTML = loadingIndicator;
-  const isVerified = await checkEmailVerification(getCurrentUser()!.id!);
-  if (!isVerified)
-  {
-    navigateTo('/email-verification');
-    return ;
+  
+  // Check email verification with caching
+  if (!isEmailVerificationChecked()) {
+    const userId = getCurrentUser()!.id!;
+    
+    // First check cache
+    const cached = getCachedVerificationStatus(userId);
+    if (cached) {
+      console.log('Dashboard: Using cached verification status:', cached.verified);
+      if (!cached.verified) {
+        if (location.pathname !== '/check-your-email') {
+          navigateTo('/check-your-email');
+        }
+        return;
+      }
+      // If verified from cache, mark as checked and continue
+      setEmailVerificationChecked(true);
+    } else {
+      // No cache available, make API call
+      app.innerHTML = loadingIndicator;
+      const isVerified = await checkEmailVerification(userId);
+      setEmailVerificationChecked(true);
+      if (!isVerified) {
+        if (location.pathname !== '/check-your-email') {
+          navigateTo('/check-your-email');
+        }
+        return;
+      }
+    }
   }
 
-
-  app.innerHTML = `
-    <div class="min-h-screen flex flex-col items-center justify-center bg-green-100">
-      <h1 class="text-3xl font-bold mb-4">Welcome to the Dashboard 🎉</h1>
-      <div class="flex space-x-4 mb-6">
-        <button id="chat-btn" class="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 transition duration-200">
-          💬 Go to Chat
-        </button>
-        <button id="logout" class="bg-red-600 text-white px-6 py-2 rounded hover:bg-red-700 transition duration-200">
-          🚪 Logout
-        </button>
-      </div>
-    </div>
-  `;
-
-  // Add event listener for chat button
-  document.getElementById('chat-btn')!.addEventListener('click', () => {
-    navigateTo('/chat');
-  });
-
-  document.getElementById('logout')!.addEventListener('click', () => {
-    logout();
-    showToast("Logout successful!", "success");
-    navigateTo('/');
-  }); 
+  // Merge configurations and initialize dashboard
+  const config = { ...defaultConfig, ...customConfig };
+  const dashboard = new DashboardManager(config);
+  await dashboard.initialize();
 }
+
+// Export the configuration builder for external use
+export { DashboardConfigBuilder };
+
+// Export types for external use
+export type { DashboardConfig };

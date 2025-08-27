@@ -7,10 +7,12 @@ export interface LoginCredentials {
 
 export interface AuthResponse {
     success: boolean;
-    accessToken?: string;
-    refreshToken?: string;
-    user?: User;
     message?: string;
+    accessToken?: string;
+    // refreshToken is now handled via HTTP-only cookies
+    user?: User;
+    pending2fa?: boolean;
+    tempToken?: string;
 }
 
 export interface BasicResponse{

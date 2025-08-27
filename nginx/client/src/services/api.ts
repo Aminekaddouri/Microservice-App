@@ -1,21 +1,35 @@
 
-import { getAccessToken, getRefreshToken, logout, saveTokens } from "@/utils/auth";
+import { getAccessToken, saveTokens } from "@/utils/auth";
 import { AuthResponse, BasicResponse, LoginCredentials } from "../types/auth"
 import { User, UserResponse } from "@/types/user";
-import { friendshipResponse } from "@/types/friendship";
-import { ConversationMessagesResponse, Message, MessageResponse } from "@/types/message";
+import { TournamentData } from "@/types/tournament";
+import { CreateGameResponse } from "@/types/game";
 import { NotificationResponse } from "@/types/notitication";
+import { Message, MessageResponse } from "@/types/message";
+import { friendshipResponse } from "@/types/friendship";
 
-
-
-
-const BACKEND_BASE_URL = '/api/'; //**************************//
+const BACKEND_BASE_URL = '/api'; //*********************//
 
 class ApiClient {
+    
     private baseUrl: string;
+    private csrfToken: string | null = null;
 
     constructor(baseUrl: string = BACKEND_BASE_URL) {
         this.baseUrl = baseUrl || process.env.BASEURL || '';
+    }
+
+    // Get CSRF token from server
+    private async getCsrfToken(): Promise<string> {
+        if (!this.csrfToken) {
+            const response = await fetch(`${this.baseUrl}/csrf-token`, {
+                method: 'GET',
+                credentials: 'include'
+            });
+            const data = await response.json();
+            this.csrfToken = data.csrfToken;
+        }
+        return this.csrfToken!;
     }
 
     private getAuthHeaders(): Record<string, string> {
@@ -32,10 +46,10 @@ class ApiClient {
         endpoint: string,
         options: RequestInit = {},
     ): Promise<T> {
-        const url = `${this.baseUrl}${endpoint}`;
-        console.log('🚀 API Request:', url, options); // 🔥 Add this
+        const url = `${this.baseUrl}/${endpoint}`
         const config: RequestInit = {
             ...options,
+            credentials: 'include', // Include cookies for all requests
             headers: {
                 ...this.getAuthHeaders(),
                 ...options.headers,
@@ -44,30 +58,31 @@ class ApiClient {
 
         try {
             let response = await fetch(url, config);
-            if (response.status === 401 && endpoint !== 'auth/refresh' && endpoint !== 'auth/login') {
+            // console.log(response.headers);
+
+            if (
+                response.status === 401 &&
+                endpoint !== 'auth/refresh' &&
+                endpoint !== 'auth/login' &&
+                endpoint !== 'auth/verify-2fa' &&
+                endpoint !== 'auth/logout'
+            ) {
                 try {
-                    const refreshToken = getRefreshToken();
-                    if (!refreshToken)
-                        throw new Error('RefreshToken invalid');
-                    const refreshRespose = await fetch(`${this.baseUrl}auth/refresh`, {
+                    const refreshRespose = await fetch(`${this.baseUrl}/auth/refresh`, {
                         method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({ refreshToken }),
+                        credentials: 'include', // Include cookies for refresh token
                     });
 
                     if (!refreshRespose.ok)
                         throw new Error('Refresh failed');
-                    const { accessToken, message } = await refreshRespose.json();
-                    saveTokens(accessToken, refreshToken);
+                    const { accessToken } = await refreshRespose.json();
+                    saveTokens(accessToken);
                     config.headers = {
                         ...config.headers,
                         Authorization: `Bearer ${accessToken}`,
                     };
-                    response = await fetch(endpoint, config);
+                    response = await fetch(url, config);
                 } catch (error) {
-                    logout();
                     console.log(error);
                     throw new Error('Session expired');
                 }
@@ -113,7 +128,7 @@ class ApiClient {
     }
 
     async verifyEmail(token: string, userId: string): Promise<BasicResponse> {
-        return this.request<BasicResponse>(`auth/verify-email?token=${token}&id=${userId}`);
+        return this.request<BasicResponse>(`auth/email-verification?token=${token}&id=${userId}`);
     }
 
     async isEmailVerified(userId: string): Promise<BasicResponse> {
@@ -124,18 +139,74 @@ class ApiClient {
         return this.request<BasicResponse>(`auth/resend-verification-email?id=${userId}`);
     }
 
-    async googleAuth(token: string) {
-        return this.request<AuthResponse>('auth/google/callback', //*********************//
-            {
-                method: 'POST',
-                body: JSON.stringify({ token }),
-            }
-        );
+    async googleAuth(payload: object): Promise<AuthResponse> {
+        return this.request<AuthResponse>('auth/google', { //*********************//
+            method: 'POST',
+            body: JSON.stringify(payload),
+        });
     }
 
     async readFriendList(): Promise<friendshipResponse> {
         return this.request<friendshipResponse>(`friendship/friend-list`);
     }
+
+    async get<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
+        return this.request<T>(endpoint, { ...options, method: 'GET' });
+    }
+
+    async post<T>(endpoint: string, data?: any, options: RequestInit = {}): Promise<T> {
+        const csrfToken = await this.getCsrfToken();
+        return this.request<T>(endpoint, {
+            ...options,
+            method: 'POST',
+            headers: {
+                'X-CSRF-Token': csrfToken,
+                ...options.headers,
+            },
+            body: data ? JSON.stringify(data) : undefined,
+        });
+    }
+
+    async put<T>(endpoint: string, data?: any, options: RequestInit = {}): Promise<T> {
+        const csrfToken = await this.getCsrfToken();
+        return this.request<T>(endpoint, {
+            ...options,
+            method: 'PUT',
+            headers: {
+                'X-CSRF-Token': csrfToken,
+                ...options.headers,
+            },
+            body: data ? JSON.stringify(data) : undefined,
+        });
+    }
+
+    async delete<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
+        const csrfToken = await this.getCsrfToken();
+        return this.request<T>(endpoint, {
+            ...options,
+            method: 'DELETE',
+            headers: {
+                'X-CSRF-Token': csrfToken,
+                ...options.headers,
+            },
+        });
+    }
+    async verify2FALogin(tempToken: string, code: string): Promise<AuthResponse> {
+        return this.post<AuthResponse>('auth/verify-2fa', { tempToken, code });
+    }
+
+    async getusergames(userId: string): Promise<any> {
+        return this.get(`games/user/${userId}`);
+    }
+
+    async getGameParticipants(gameId: string): Promise<any> {
+        return this.get(`games/${gameId}/participants`);
+    }
+
+    async getuserbyid(userId: string): Promise<any> {
+        return this.get(`users/${userId}`);
+    }
+
 
     async sendMessage(message: Message): Promise<MessageResponse> {
         return this.request<MessageResponse>(`messages/`,
@@ -150,19 +221,12 @@ class ApiClient {
         return this.request<Message[]>(`messages/${userId}/conv/${friendId}`);
     }///:id/conv/:friendId
 
-    async getuserbyid(userId: string): Promise<UserResponse> {
-        return this.request<UserResponse>(`users/${userId}`);
-    }
 
     async getAllUsers(): Promise<UserResponse> {
-        return this.request<UserResponse>('users'); //**********************//
+        return this.request<UserResponse>('users'); //*********************//
     }
 
     async addFriend(friendId: string): Promise<any> {
-        console.log('Adding friend:', friendId); //**************//
-        if (!friendId) { //**************//
-            throw new Error('Invalid friendId'); //**************//
-        } //**************//
         return this.request<any>('friendship/add-friend', {
             method: 'POST',
             body: JSON.stringify({ targetUserId: friendId })
@@ -179,12 +243,20 @@ class ApiClient {
         return this.request<NotificationResponse>('notifications/me');
     }
     async sendNotification(content: string, type: string, receiversIds: string[]): Promise<NotificationResponse> {
-        return this.request<NotificationResponse>('notifications/', { //*********************/
+        return this.request<NotificationResponse>('notifications/', {
             method: 'POST',
             body: JSON.stringify({ content, type, receiversIds })
         });
     }
     async acceptFriendRequest(friendshipId: string): Promise<NotificationResponse> {
+        console.log("Accepting friend request with ID????????:", friendshipId);
+        if (!friendshipId) {
+            throw new Error("Friendship ID is required to accept a friend request.");
+        }
+        console.log("Sending request to accept friend request with ID:", friendshipId);
+        // Ensure the endpoint matches your server's route
+        console.log("Requesting endpoint: friendship/accept");
+        console.log("Request body:", JSON.stringify({ friendshipId }));
         return this.request<NotificationResponse>('friendship/accept', {
             method: 'POST',
             body: JSON.stringify({ friendshipId })
@@ -233,12 +305,60 @@ class ApiClient {
             body:JSON.stringify({targetUserId: friendId})
         });
     }
+
+    async getBlockedUsers(): Promise<any> {
+        return this.request<any>('friendship/block-list');
+    }
     async clearAllNotifications(): Promise<{ success: boolean; message: string }> {
-    return this.request<{ success: boolean; message: string }>('notifications/clear-all', {
-        method: 'DELETE',
-        body:JSON.stringify('')
-    });
-}
+        return this.request<{ success: boolean; message: string }>('notifications/clear-all', {
+            method: 'DELETE',
+        });
+    }
+    async deleteNotification(notificationId: string): Promise<{ success: boolean; message: string }> {
+        console.log("delete notification success,, ", notificationId);
+        return this.request<{ success: boolean; message: string }>(`notifications/${notificationId}`, {
+            method: 'DELETE',
+            body: JSON.stringify({notificationId})
+        });
+    }
+
+    async listgames(idgame?: string): Promise<CreateGameResponse> {
+        const endpoint = idgame ? `games?status=${idgame}` : 'games';
+        return this.request<CreateGameResponse>(`games/`);
+    }
+    async getgame(gameId: string): Promise<CreateGameResponse> {
+        return this.request<CreateGameResponse>(`games/${gameId}`);
+    }
+    // tournament related
+    async createTournament(tournamentName: string): Promise<{ success: boolean; message?: string, tournamentId: string }> {
+        return this.request<{ success: boolean; message?: string, tournamentId: string }>('tournament', {
+            method: 'POST',
+            body: JSON.stringify({tournamentName: tournamentName})
+        });
+    }
+    async getOwnedTounamentId() {
+        return this.request<{ success: boolean; message?: string, tournamentId: string }>('tournament/ownedTournament');
+    }
+    async joinTouranement(tournamentId: string) {
+        return this.request<{ success: boolean; message?: string }>(`tournament/join/${tournamentId}`, 
+            {
+                method: 'POST',
+                body: JSON.stringify({empty: 0})
+            }
+        );
+    }
+    async getJoinedTournament() {
+        return this.request<{ success: boolean; message?: string, tournamentId: string }>('tournament/joinedTournament')
+    }
+    async getTournament(tournamentId: string) {
+        return this.request<{ success: boolean; message?: string, tournament: TournamentData }>(`tournament/${tournamentId}`);
+    }
+    async leaveTournament() {
+        return this.request<{success: boolean; message?: string }>('tournament/leave', {
+            method: 'DELETE',
+            body: JSON.stringify({})
+        });
+    }
 }
 
 export const api = new ApiClient();
