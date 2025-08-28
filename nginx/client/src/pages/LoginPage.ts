@@ -15,11 +15,14 @@ export async function renderLogin() {
 
   // Wait for translations to load before rendering
   await i18n.waitForTranslations();
+  
+  // Add auth-page class to body for scrolling
+  document.body.classList.add('auth-page');
 
   document.getElementById('app')!.innerHTML = `
-    <main class="w-full min-h-screen flex items-center justify-center">
+    <main class="w-full min-h-screen overflow-y-auto">
       <section 
-        class="relative w-full min-h-screen bg-[url('https://c.animaapp.com/meotu59csaTQmy/img/1920-1080-2.png')] bg-cover bg-center flex flex-col items-center justify-center px-6"
+        class="relative w-full min-h-screen bg-[url('https://c.animaapp.com/meotu59csaTQmy/img/1920-1080-2.png')] bg-cover bg-center flex flex-col items-center justify-center px-3 sm:px-6 py-8 sm:py-12"
       >
         <!-- Overlay -->
         <div class="absolute inset-0 bg-black/30" aria-hidden="true"></div>
@@ -30,9 +33,9 @@ export async function renderLogin() {
         </div>
 
         <!-- Content -->
-        <div class="relative z-10 w-full max-w-md text-center space-y-6">
+        <div class="relative z-10 w-full max-w-md text-center space-y-4 sm:space-y-6">
           <!-- Beautiful Glass Container -->
-          <div class="relative backdrop-blur-xl bg-white/10 border border-white/20 rounded-3xl p-8 shadow-2xl">
+          <div class="relative backdrop-blur-xl bg-white/10 border border-white/20 rounded-3xl p-4 sm:p-6 md:p-8 shadow-2xl">
             <!-- Gradient overlay for extra depth -->
             <div class="absolute inset-0 bg-gradient-to-br from-white/20 via-white/5 to-transparent rounded-3xl"></div>
             
@@ -40,7 +43,7 @@ export async function renderLogin() {
             <div class="absolute inset-0 rounded-3xl shadow-inner shadow-white/10"></div>
             
             <!-- Content inside container -->
-            <div class="relative z-10 space-y-6">
+            <div class="relative z-10 space-y-3 sm:space-y-4 md:space-y-6">
               <!-- Title -->
               <header class="flex items-center justify-center gap-3">
                 <h1 class="font-semibold text-white text-3xl md:text-4xl drop-shadow-lg">
@@ -244,7 +247,7 @@ function showEmailLoginForm() {
   if (content) {
     content.innerHTML = `
       <!-- Beautiful Glass Container for Form -->
-      <div class="relative backdrop-blur-xl bg-white/10 border border-white/20 rounded-3xl p-8 shadow-2xl max-w-md w-full">
+      <div class="relative backdrop-blur-xl bg-white/10 border border-white/20 rounded-3xl p-4 sm:p-6 md:p-8 shadow-2xl max-w-md w-full mx-4 sm:mx-0">
         <!-- Gradient overlay -->
         <div class="absolute inset-0 bg-gradient-to-br from-white/20 via-white/5 to-transparent rounded-3xl"></div>
         
@@ -252,7 +255,7 @@ function showEmailLoginForm() {
         <div class="absolute inset-0 rounded-3xl shadow-inner shadow-white/10"></div>
         
         <!-- Content -->
-        <div class="relative z-10 space-y-6">
+        <div class="relative z-10 space-y-4 sm:space-y-6">
           <!-- Back Button -->
           <button id="back-btn" class="text-white/80 hover:text-white transition flex items-center gap-2 text-sm">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -263,20 +266,20 @@ function showEmailLoginForm() {
           
           <!-- Title -->
           <header class="text-center">
-            <h1 class="font-semibold text-white text-3xl md:text-4xl drop-shadow-lg">
+            <h1 class="font-semibold text-white text-2xl sm:text-3xl md:text-4xl drop-shadow-lg">
               ${i18n.t('auth.signInWithEmail')}
             </h1>
             <p class="italic text-white/80 text-sm mt-2">${i18n.t('auth.enterCredentials')}</p>
           </header>
 
-          <!-- Login Form -->
-          <form id="login-form" class="space-y-4">
+         <!-- Login Form -->
+              <form id="login-form" class="space-y-3 sm:space-y-4 md:space-y-6">
             <div>
               <input 
                 type="email" 
                 id="email" 
                 placeholder="${i18n.t('auth.email')}"
-                class="w-full px-4 py-3 rounded-xl bg-white/10 border border-white/20 text-white placeholder-white/60 focus:outline-none focus:border-white/40 focus:ring-2 focus:ring-white/20 transition-all"
+                class="w-full px-4 py-4 sm:py-3 rounded-xl bg-white/10 border border-white/20 text-white placeholder-white/60 focus:outline-none focus:border-white/40 focus:ring-2 focus:ring-white/20 transition-all text-center sm:text-left"
                 required
               >
             </div>
@@ -285,14 +288,14 @@ function showEmailLoginForm() {
                 type="password" 
                 id="password" 
                 placeholder="${i18n.t('auth.password')}"
-                class="w-full px-4 py-3 rounded-xl bg-white/10 border border-white/20 text-white placeholder-white/60 focus:outline-none focus:border-white/40 focus:ring-2 focus:ring-white/20 transition-all"
+                class="w-full px-4 py-4 sm:py-3 rounded-xl bg-white/10 border border-white/20 text-white placeholder-white/60 focus:outline-none focus:border-white/40 focus:ring-2 focus:ring-white/20 transition-all text-center sm:text-left"
                 required
                 minlength="8"
               >
             </div>
             <button 
               type="submit" 
-              class="group relative w-full bg-gradient-to-r from-orange-500/90 to-orange-600/90 hover:from-orange-500 hover:to-orange-600 text-white rounded-2xl py-3 px-6 flex items-center justify-center shadow-xl hover:shadow-2xl transform hover:scale-[1.01] transition-all duration-300 ease-out border border-orange-400/30 hover:border-orange-400/50 overflow-hidden backdrop-blur-sm font-semibold"
+              class="group relative w-full bg-gradient-to-r from-orange-500/90 to-orange-600/90 hover:from-orange-500 hover:to-orange-600 text-white rounded-2xl py-4 sm:py-3 px-6 flex items-center justify-center shadow-xl hover:shadow-2xl transform hover:scale-[1.01] transition-all duration-300 ease-out border border-orange-400/30 hover:border-orange-400/50 overflow-hidden backdrop-blur-sm font-semibold text-base sm:text-sm"
             >
               <span class="relative z-10">${i18n.t('auth.signIn')}</span>
               <div class="absolute inset-0 -translate-x-full group-hover:translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent transition-transform duration-700 ease-out"></div>
@@ -467,12 +470,12 @@ function show2FAVerificationForm(tempToken: string) {
   const content = document.querySelector('.relative.z-10');
   if (content) {
     content.innerHTML = `
-      <div class="relative backdrop-blur-xl bg-white/10 border border-white/20 rounded-3xl p-8 shadow-2xl max-w-md w-full">
+      <div class="relative backdrop-blur-xl bg-white/10 border border-white/20 rounded-3xl p-4 sm:p-6 md:p-8 shadow-2xl max-w-md w-full mx-4 sm:mx-0">
         <div class="absolute inset-0 bg-gradient-to-br from-white/20 via-white/5 to-transparent rounded-3xl"></div>
         <div class="absolute inset-0 rounded-3xl shadow-inner shadow-white/10"></div>
-        <div class="relative z-10 space-y-6">
+        <div class="relative z-10 space-y-4 sm:space-y-6">
           <header class="text-center">
-            <h1 class="font-semibold text-white text-3xl md:text-4xl drop-shadow-lg">
+            <h1 class="font-semibold text-white text-2xl sm:text-3xl md:text-4xl drop-shadow-lg">
               ${i18n.t('auth.twoFactorAuth')}
             </h1>
             <p class="italic text-white/80 text-sm mt-2">${i18n.t('auth.enterAuthCode')}</p>
@@ -484,14 +487,14 @@ function show2FAVerificationForm(tempToken: string) {
                 type="text" 
                 id="2fa-code" 
                 placeholder="${i18n.t('auth.enterSixDigitCode')}"
-                class="w-full px-4 py-3 rounded-xl bg-white/10 border border-white/20 text-white placeholder-white/60 focus:outline-none focus:border-white/40 focus:ring-2 focus:ring-white/20 transition-all"
+                class="w-full px-4 py-4 sm:py-3 rounded-xl bg-white/10 border border-white/20 text-white placeholder-white/60 focus:outline-none focus:border-white/40 focus:ring-2 focus:ring-white/20 transition-all text-center sm:text-left"
                 required
                 maxlength="6"
               >
             </div>
             <button 
               type="submit" 
-              class="group relative w-full bg-gradient-to-r from-orange-500/90 to-orange-600/90 hover:from-orange-500 hover:to-orange-600 text-white rounded-2xl py-3 px-6 flex items-center justify-center shadow-xl hover:shadow-2xl transform hover:scale-[1.01] transition-all duration-300 ease-out border border-orange-400/30 hover:border-orange-400/50 overflow-hidden backdrop-blur-sm font-semibold"
+              class="group relative w-full bg-gradient-to-r from-orange-500/90 to-orange-600/90 hover:from-orange-500 hover:to-orange-600 text-white rounded-2xl py-4 sm:py-3 px-6 flex items-center justify-center shadow-xl hover:shadow-2xl transform hover:scale-[1.01] transition-all duration-300 ease-out border border-orange-400/30 hover:border-orange-400/50 overflow-hidden backdrop-blur-sm font-semibold text-base sm:text-sm"
             >
               <span class="relative z-10">${i18n.t('auth.verify')}</span>
               <div class="absolute inset-0 -translate-x-full group-hover:translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent transition-transform duration-700 ease-out"></div>

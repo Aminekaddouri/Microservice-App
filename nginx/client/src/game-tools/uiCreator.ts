@@ -1,5 +1,5 @@
 import { gameData } from "@/pages/GamePage";
-import { themeService, UserTheme } from "@/services/themeService";
+import { loadAndApplyTheme, getCurrentTheme, GameTheme } from '@/services/themeService';
 
 // type GameCustomization = {
 //   paddleColor?: string;
@@ -15,11 +15,6 @@ export async function createGameFrame(): Promise<HTMLElement> {
     'rounded-3xl',
     'shadow-2xl'
   );
-  
-  // Load theme and apply board color
-  const theme = await themeService.getCurrentTheme();
-  gameFrame.style.backgroundColor = theme.board_color;
-  
   const theMiddle = document.createElement('div');
   theMiddle.classList.add(
     'absolute',
@@ -36,6 +31,10 @@ export async function createGameFrame(): Promise<HTMLElement> {
     'border-orange-400'    // Orange line color
   )
   
+  // Load theme and apply board color
+  const theme = await getCurrentTheme();
+  gameFrame.style.backgroundColor = theme.board_color;
+  
   gameFrame.appendChild(theMiddle);
   gameFrame.id = 'gameFrame';
   return gameFrame;
@@ -49,10 +48,13 @@ export async function createPaddle(side: 'left' | 'right'): Promise<HTMLElement>
       'shadow-lg'
   );
   
-  // Load theme and apply paddle color based on side
-  const theme = await themeService.getCurrentTheme();
-  const paddleColor = side === 'left' ? theme.left_paddle_color : theme.right_paddle_color;
-  paddle.style.backgroundColor = paddleColor;
+  // Load theme and apply paddle color
+  const theme = await getCurrentTheme();
+  if (side === 'left') {
+    paddle.style.backgroundColor = theme.left_paddle_color;
+  } else {
+    paddle.style.backgroundColor = theme.right_paddle_color;
+  }
   
   return paddle;
 }
@@ -101,7 +103,7 @@ export async function createBall(): Promise<HTMLElement> {
   );
   
   // Load theme and apply ball color
-  const theme = await themeService.getCurrentTheme();
+  const theme = await getCurrentTheme();
   ball.style.backgroundColor = theme.ball_color;
   
   return ball;

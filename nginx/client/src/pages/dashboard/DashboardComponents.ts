@@ -1,9 +1,9 @@
 import { DashboardConfig } from './DashboardConfig';
-import { Chart, ArcElement, Tooltip, Legend } from 'chart.js';
+import { Chart, ArcElement, Tooltip, Legend, DoughnutController, CategoryScale, LinearScale } from 'chart.js';
 import { Game } from '@/types/game';
 import { i18n } from '@/services/i18n';
 
-Chart.register(ArcElement, Tooltip, Legend);
+Chart.register(ArcElement, Tooltip, Legend, DoughnutController, CategoryScale, LinearScale);
 
 export class DashboardComponents {
   private config: DashboardConfig;
@@ -43,14 +43,15 @@ export class DashboardComponents {
            backdrop-filter backdrop-blur-xl border border-white/20 shadow-2xl
            hover:shadow-${card.gradient.split('-')[1]}-500/20 hover:border-${card.gradient.split('-')[1]}-400/30 
            transition-all duration-500 group cursor-pointer
-           before:absolute before:inset-0 before:bg-gradient-to-br before:${card.gradient.replace('to-', 'before:to-')}/5 before:rounded-2xl">
-        <div class="relative z-10 p-6 sm:p-8 text-center">
+           before:absolute before:inset-0 before:bg-gradient-to-br before:${card.gradient.replace('to-', 'before:to-')}/5 before:rounded-2xl
+           min-h-[200px] flex flex-col">
+        <div class="relative z-10 p-4 sm:p-6 lg:p-8 text-center flex-1 flex flex-col justify-center">
           <!-- Enhanced Icon with Glow Effect -->
-          <div class="flex items-center justify-center mb-6">
+          <div class="flex items-center justify-center mb-4 sm:mb-6">
             <div class="relative">
               <div class="absolute -inset-2 bg-gradient-to-r ${card.gradient} rounded-full blur opacity-60 group-hover:opacity-100 transition duration-500"></div>
-              <div class="relative w-16 h-16 rounded-full bg-gradient-to-r ${card.gradient} flex items-center justify-center shadow-xl">
-                <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div class="relative w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-gradient-to-r ${card.gradient} flex items-center justify-center shadow-xl">
+                <svg class="w-6 h-6 sm:w-8 sm:h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   ${card.icon}
                 </svg>
               </div>
@@ -58,9 +59,9 @@ export class DashboardComponents {
           </div>
           
           <!-- Enhanced Typography -->
-          <div class="space-y-3">
-            <h3 class="text-gray-300 text-sm font-semibold uppercase tracking-wider">${card.title}</h3>
-            <p id="${card.id}" class="text-white text-4xl sm:text-5xl font-bold ${card.hoverColor} transition-colors duration-500">0</p>
+          <div class="space-y-2 sm:space-y-3">
+            <h3 class="text-gray-300 text-xs sm:text-sm font-semibold uppercase tracking-wider">${card.title}</h3>
+            <p id="${card.id}" class="text-white text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-bold ${card.hoverColor} transition-colors duration-500">0</p>
           </div>
           
           <!-- Subtle Bottom Accent -->
@@ -74,18 +75,25 @@ export class DashboardComponents {
     return `
       <div class="w-full">
         <div class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-yellow-900/40 via-orange-900/30 to-red-900/40 
-             backdrop-filter backdrop-blur-xl border border-yellow-500/30 shadow-2xl p-6 sm:p-8">
+             backdrop-filter backdrop-blur-xl border border-yellow-500/30 shadow-2xl p-4 sm:p-6 lg:p-8">
           <div class="absolute inset-0 bg-gradient-to-r from-yellow-600/10 to-orange-600/10"></div>
           <div class="relative">
-            <h2 class="text-2xl sm:text-3xl font-bold text-center mb-6 bg-gradient-to-r from-yellow-400 to-orange-400 bg-clip-text text-transparent">
+            <h2 class="text-xl sm:text-2xl lg:text-3xl font-bold text-center mb-4 sm:mb-6 bg-gradient-to-r from-yellow-400 to-orange-400 bg-clip-text text-transparent">
               ${i18n.t('dashboard.gameSessionsOverview')}
             </h2>
-            <div id="session-stats" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
-            <div id="session-placeholder" class="hidden text-center py-12">
-              <div class="text-6xl mb-4">⏱️</div>
-              <h3 class="text-xl font-semibold text-gray-300 mb-2">${i18n.t('dashboard.noSessionData')}</h3>
-              <p class="text-gray-400">${i18n.t('dashboard.startPlayingToTrack')}</p>
+            <div id="session-stats" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6"></div>
+            <div id="session-placeholder" class="hidden text-center py-8 sm:py-12">
+              <div class="text-4xl sm:text-6xl mb-4">⏱️</div>
+              <h3 class="text-lg sm:text-xl font-semibold text-gray-300 mb-2">${i18n.t('dashboard.noSessionData')}</h3>
+              <p class="text-sm sm:text-base text-gray-400">${i18n.t('dashboard.startPlayingToTrack')}</p>
             </div>
+            <button id="session-see-more-btn" 
+                    class="mt-6 sm:mt-8 px-6 sm:px-8 py-2 sm:py-3 bg-gradient-to-r from-yellow-500 to-orange-500 text-white rounded-full 
+                           hover:from-yellow-600 hover:to-orange-600 transform hover:scale-105 
+                           transition-all duration-300 mx-auto block hidden font-semibold shadow-xl
+                           border border-yellow-400/30 hover:border-yellow-300/50 text-sm sm:text-base">
+              Load More Sessions
+            </button>
           </div>
         </div>
       </div>
@@ -96,24 +104,35 @@ export class DashboardComponents {
     const strokeDashoffset = 276 - (ratio * 2.76);
 
     return `
-      <div class="win-rate-circle relative w-24 h-24 sm:w-28 sm:h-28">
+      <div class="win-rate-circle relative w-20 h-20 sm:w-24 sm:h-24 lg:w-28 lg:h-28 xl:w-32 xl:h-32">
         <svg class="w-full h-full transform -rotate-90">
-          <circle cx="50%" cy="50%" r="44" stroke="#e5e7eb" stroke-width="8" fill="transparent"/>
-          <circle cx="50%" cy="50%" r="44" stroke="#4f46e5" stroke-width="8" fill="transparent"
+          <circle cx="50%" cy="50%" r="44" stroke="#e5e7eb" stroke-width="6" fill="transparent"/>
+          <circle cx="50%" cy="50%" r="44" stroke="#4f46e5" stroke-width="6" fill="transparent"
             stroke-dasharray="276" stroke-dashoffset="${strokeDashoffset}" stroke-linecap="round"/>
         </svg>
         <div class="absolute inset-0 flex flex-col items-center justify-center text-center">
-          <span class="text-lg sm:text-2xl font-bold text-white">${ratio}%</span>
-          <span class="text-xs text-gray-300">${i18n.t('dashboard.winRate')}</span>
+          <span class="text-sm sm:text-lg lg:text-xl xl:text-2xl font-bold text-white">${ratio}%</span>
+          <span class="text-xs sm:text-xs lg:text-sm text-gray-300">${i18n.t('dashboard.winRate')}</span>
         </div>
       </div>
     `;
   }
 
   renderTrendChart(trendData: number[]) {
-    const canvas = document.getElementById('trend-chart') as HTMLCanvasElement;
-    const ctx = canvas?.getContext('2d');
-    if (!ctx) return;
+    // Add a small delay to ensure canvas is properly mounted
+    setTimeout(() => {
+      const canvas = document.getElementById('trend-chart') as HTMLCanvasElement;
+      const ctx = canvas?.getContext('2d');
+      if (!ctx) {
+        console.warn('Canvas context not available for chart rendering');
+        return;
+      }
+      
+      this.doRenderChart(canvas, ctx, trendData);
+    }, 100);
+  }
+
+  private doRenderChart(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, trendData: number[]) {
 
     // Calculate statistics
     const wins = trendData.filter(val => val === 1).length;

@@ -34,7 +34,7 @@ export function online(type: string, pathToGoAftertheIsOver: string) {
   socket.on('connect', async () => {
     const app = document.getElementById('app');
     if (!app) return;
-    sharedData.game = createTheGame(app);
+    sharedData.game = await createTheGame(app);
     const pong = sharedData.game;
     if (pong) {
       pong.setLeftPaddleEvents(socket);

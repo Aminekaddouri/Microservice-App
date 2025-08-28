@@ -1,4 +1,4 @@
-export type SupportedLanguage = 'en' | 'fr' | 'es';
+export type SupportedLanguage = 'en' | 'fr' | 'es' | 'fi';
 
 export interface TranslationKeys {
   // Navigation
@@ -115,16 +115,18 @@ class I18nService {
   private async loadTranslations(): Promise<void> {
     try {
       // Dynamic imports for better code splitting
-      const [en, fr, es] = await Promise.all([
+      const [en, fr, es, fi] = await Promise.all([
         import('../locales/en.json'),
         import('../locales/fr.json'),
-        import('../locales/es.json')
+        import('../locales/es.json'),
+        import('../locales/fi.json')
       ]);
       
       this.translations = {
         en: en.default,
         fr: fr.default,
-        es: es.default
+        es: es.default,
+        fi: fi.default
       };
       
       this.translationsLoaded = true;
@@ -167,7 +169,7 @@ class I18nService {
   }
   
   private isValidLanguage(lang: string): lang is SupportedLanguage {
-    return ['en', 'fr', 'es'].includes(lang);
+    return ['en', 'fr', 'es', 'fi'].includes(lang);
   }
   
   public getCurrentLanguage(): SupportedLanguage {
@@ -236,7 +238,8 @@ class I18nService {
     return [
       { code: 'en', name: 'English', nativeName: 'English' },
       { code: 'fr', name: 'French', nativeName: 'Français' },
-      { code: 'es', name: 'Spanish', nativeName: 'Español' }
+      { code: 'es', name: 'Spanish', nativeName: 'Español' },
+      { code: 'fi', name: 'Finnish', nativeName: 'Suomi' }
     ];
   }
 }

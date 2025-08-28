@@ -8,7 +8,7 @@ import { NotificationResponse } from "@/types/notitication";
 import { Message, MessageResponse } from "@/types/message";
 import { friendshipResponse } from "@/types/friendship";
 
-const BACKEND_BASE_URL = '/api'; //*********************//
+const BACKEND_BASE_URL = '/api';
 
 class ApiClient {
     
@@ -47,6 +47,7 @@ class ApiClient {
         options: RequestInit = {},
     ): Promise<T> {
         const url = `${this.baseUrl}/${endpoint}`
+        console.log('🚀 API Request:', url, options); // 🔥 Add this
         const config: RequestInit = {
             ...options,
             credentials: 'include', // Include cookies for all requests
@@ -140,7 +141,7 @@ class ApiClient {
     }
 
     async googleAuth(payload: object): Promise<AuthResponse> {
-        return this.request<AuthResponse>('auth/google', { //*********************//
+        return this.request<AuthResponse>('auth/google', {
             method: 'POST',
             body: JSON.stringify(payload),
         });
@@ -223,7 +224,7 @@ class ApiClient {
 
 
     async getAllUsers(): Promise<UserResponse> {
-        return this.request<UserResponse>('users'); //*********************//
+        return this.request<UserResponse>('users/');
     }
 
     async addFriend(friendId: string): Promise<any> {

@@ -1,5 +1,6 @@
 import { api } from './api';
 import { getCurrentUser } from '../utils/authState';
+import { i18n } from './i18n';
 
 // Types and Interfaces
 interface NotificationData {
@@ -351,7 +352,7 @@ export class NotificationService {
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
                                 </svg>
-                                <span>Accept</span>
+                                <span>${i18n.t('chat.accept')}</span>
                             </span>
                             <div class="absolute inset-0 -translate-x-full group-hover:translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent transition-transform duration-700 ease-out"></div>
                         </button>
@@ -361,7 +362,7 @@ export class NotificationService {
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                                 </svg>
-                                <span>Decline</span>
+                                <span>${i18n.t('chat.decline')}</span>
                             </span>
                             <div class="absolute inset-0 -translate-x-full group-hover:translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent transition-transform duration-700 ease-out"></div>
                         </button>

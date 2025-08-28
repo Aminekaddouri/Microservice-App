@@ -187,7 +187,7 @@ export class MessageInput {
     try {
       await this.props.onSendMessage(content);
       this.clearInput();
-      errorHandler.showSuccess('Message sent!', 1500);
+      // errorHandler.showSuccess('Message sent!', 1500);
     } catch (error) {
       console.error('Failed to send message:', error);
       errorHandler.showError(error instanceof Error ? error.message : 'Failed to send message. Please try again.');

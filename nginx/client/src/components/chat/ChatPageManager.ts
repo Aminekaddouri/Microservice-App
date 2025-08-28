@@ -57,7 +57,7 @@ export class ChatPageManager {
     const statusDot = this.container.querySelector('#friend-status-dot');
     
     if (statusText) {
-      statusText.textContent = isOnline ? 'Online' : 'Offline';
+      statusText.textContent = isOnline ? i18n.t('chat.online') : i18n.t('chat.offline');
     }
     
     if (statusDot) {
@@ -129,20 +129,12 @@ export class ChatPageManager {
             <h2 class="text-lg font-semibold text-white truncate">
               ${this.props.selectedFriend.fullName || 'Unknown User'}
             </h2>
-            <p id="friend-status" class="text-sm text-white/60">Offline</p>
+            <p id="friend-status" class="text-sm text-white/60">${i18n.t('chat.offline')}</p>
           </div>
           
           <!-- Chat Options -->
           <div class="flex items-center space-x-2">
-            <button 
-              id="clear-chat-btn"
-              class="p-2 text-white/60 hover:text-white hover:bg-white/10 rounded-lg transition-colors"
-              title="Clear conversation"
-            >
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-              </svg>
-            </button>
+            
             <button 
               id="chat-info-btn"
               class="p-2 text-white/60 hover:text-white hover:bg-white/10 rounded-lg transition-colors"
@@ -331,11 +323,11 @@ export class ChatPageManager {
         });
         
         // Show success feedback
-        errorHandler.showSuccess('Message sent successfully', 2000);
+        // errorHandler.showSuccess('Message sent successfully', 2000);
       } else {
         // Fallback to API if socket is not available
         await this.sendMessageViaAPI(message);
-        errorHandler.showSuccess('Message sent via API', 2000);
+        // errorHandler.showSuccess('Message sent via API', 2000);
       }
     } catch (error) {
       console.error('Failed to send message:', error);
@@ -424,7 +416,7 @@ export class ChatPageManager {
     // Listen for message sent confirmation
     this.props.socket.on('message-sent-success', (messageData: any) => {
       this.handleMessageSentSuccess(messageData);
-      errorHandler.showSuccess('Message delivered', 2000);
+      // errorHandler.showSuccess('Message delivered', 2000);
     });
 
     // Listen for message send errors
@@ -560,7 +552,7 @@ export class ChatPageManager {
         <svg class="w-5 h-5 text-blue-400 group-hover:text-blue-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
         </svg>
-        <span>${i18n.t('profile.viewProfile')}</span>
+        <span>${i18n.t('profile.viewProfille')}</span>
       </button>
       
       <button 

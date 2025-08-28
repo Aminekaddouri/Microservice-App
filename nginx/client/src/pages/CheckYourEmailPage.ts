@@ -5,6 +5,7 @@ import { navigateTo } from "@/utils/router";
 import { loadingIndicator, showToast } from "@/utils/utils";
 import { checkEmailVerification } from "./LoginPage";
 import { i18n } from "@/services/i18n";
+import { navigationManager } from "../utils/NavigationManager";
 
 export async function renderCheckYourEmailPage() {
   const app = document.getElementById("app");
@@ -98,7 +99,7 @@ export async function renderCheckYourEmailPage() {
                   id="logout-btn"
                   class="group relative w-full bg-gradient-to-r from-red-500/90 to-red-600/90 hover:from-red-500 hover:to-red-600 text-white rounded-2xl py-3 px-6 flex items-center justify-center shadow-xl hover:shadow-2xl transform hover:scale-[1.01] transition-all duration-300 ease-out border border-red-400/30 hover:border-red-400/50 overflow-hidden backdrop-blur-sm font-semibold"
                 >
-                  <span class="relative z-10">${i18n.t('auth.logout')}</span>
+                  <span class="relative z-10">${i18n.t('nav.logout')}</span>
                   <div class="absolute inset-0 -translate-x-full group-hover:translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent transition-transform duration-700 ease-out"></div>
                 </button>
               </div>
@@ -144,10 +145,7 @@ export async function renderCheckYourEmailPage() {
     }
   });
   logoutBtn?.addEventListener("click", () => {
-    logout();
-    if (location.pathname !== '/') {
-      navigateTo('/');
-    }
+    navigationManager.handleLogout();
   });
 
   // Add polling to check email verification with backoff and max attempts

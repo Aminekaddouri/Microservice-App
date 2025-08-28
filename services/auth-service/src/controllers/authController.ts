@@ -32,7 +32,7 @@ async function registerUser(
 
         const token = generateSecureToken();
         await verificaionModel.createVerification(user.id, token);
-        const link = `${process.env.FRONT_DOMAIN_NAME}/verify-email?token=${token}&id=${user.id}`;
+        const link = `${process.env.FRONT_DOMAIN_NAME}/check-your-email?token=${token}&id=${user.id}`;
         await verificaionModel.sendVerificationEmail(user.email, link);
         // const { password: _, ...safeUser } = user;
         reply.send({

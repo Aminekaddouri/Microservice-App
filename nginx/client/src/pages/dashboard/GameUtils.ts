@@ -1,6 +1,7 @@
 import { api } from '@/services/api';
 import { Game, GameParticipant } from '@/types/game';
 import { DashboardConfig } from './DashboardConfig';
+import { i18n } from '@/services/i18n';
 
 export class GameUtils {
   private config: DashboardConfig;
@@ -93,91 +94,94 @@ export class GameUtils {
      };
 
     return `
-      <div class="relative overflow-hidden rounded-2xl 
+      <div class="relative overflow-hidden rounded-xl sm:rounded-2xl 
            bg-gradient-to-br from-white/10 via-white/5 to-transparent 
            backdrop-filter backdrop-blur-xl border border-white/20 shadow-2xl
            hover:shadow-${result === 'win' ? 'green' : result === 'loss' ? 'red' : 'gray'}-500/30 
            hover:border-${result === 'win' ? 'green' : result === 'loss' ? 'red' : 'gray'}-400/40 
-           transition-all duration-500 group cursor-pointer
-           before:absolute before:inset-0 before:${style.bg} before:rounded-2xl before:opacity-30">
+           transition-all duration-500 group cursor-pointer game-card
+           before:absolute before:inset-0 before:${style.bg} before:rounded-xl before:sm:rounded-2xl before:opacity-30
+           min-h-[280px] sm:min-h-[320px] flex flex-col">
         
         <!-- Enhanced Background Effects -->
         <div class="absolute inset-0 bg-gradient-to-br ${style.bg} opacity-20"></div>
         <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r ${style.border.replace('border-', 'from-')} ${style.border.replace('border-', 'to-')} opacity-60"></div>
         
         <!-- Content -->
-        <div class="relative z-10 p-6 text-center">
+        <div class="relative z-10 p-4 sm:p-6 text-center flex-1 flex flex-col justify-between">
           <!-- Enhanced Player Avatar with Glow -->
-          <div class="relative mb-6">
+          <div class="relative mb-4 sm:mb-6">
             <div class="relative">
               <!-- Glow Effect -->
-              <div class="absolute -inset-3 bg-gradient-to-r ${style.border.replace('border-', 'from-')} ${style.border.replace('border-', 'to-')} rounded-full blur opacity-40 group-hover:opacity-70 transition duration-500"></div>
+              <div class="absolute -inset-2 sm:-inset-3 bg-gradient-to-r ${style.border.replace('border-', 'from-')} ${style.border.replace('border-', 'to-')} rounded-full blur opacity-40 group-hover:opacity-70 transition duration-500"></div>
               
               <!-- Avatar Container -->
-              <div class="relative w-20 h-20 mx-auto rounded-full overflow-hidden border-2 border-white/30 shadow-xl group-hover:border-white/50 transition-all duration-300">
+              <div class="relative w-16 h-16 sm:w-20 sm:h-20 mx-auto rounded-full overflow-hidden border-2 border-white/30 shadow-xl group-hover:border-white/50 transition-all duration-300">
                 <img src="${getImageSrc()}" 
                      alt="${opponent?.user?.fullName || 'Player'}" 
                      class="w-full h-full object-cover"
                      onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                <div class="w-full h-full bg-gradient-to-br ${getRandomGradient()} flex items-center justify-center text-white text-xl font-bold" style="display: none;">
+                <div class="w-full h-full bg-gradient-to-br ${getRandomGradient()} flex items-center justify-center text-white text-lg sm:text-xl font-bold" style="display: none;">
                   ${getImageFallback()}
                 </div>
               </div>
             </div>
             
             <!-- Enhanced Result Badge -->
-            <div class="absolute -top-1 -right-1 w-10 h-10 rounded-full 
+            <div class="absolute -top-1 -right-1 w-8 h-8 sm:w-10 sm:h-10 rounded-full 
                  bg-gradient-to-br from-white/90 to-white/70 backdrop-blur-sm 
-                 border-2 ${style.border} flex items-center justify-center text-xl shadow-xl
+                 border-2 ${style.border} flex items-center justify-center text-lg sm:text-xl shadow-xl
                  group-hover:scale-110 transition-transform duration-300">
               ${style.icon}
             </div>
           </div>
           
           <!-- Enhanced Player Name -->
-          <div class="mb-4">
-            <h3 class="text-white font-bold text-lg mb-1 truncate px-2 group-hover:${style.accent} transition-colors duration-300">
+          <div class="mb-3 sm:mb-4">
+            <h3 class="text-white font-bold text-base sm:text-lg mb-1 truncate px-1 sm:px-2 group-hover:${style.accent} transition-colors duration-300">
               ${opponent?.user?.fullName || opponent?.user?.nickname || 'Unknown Player'}
             </h3>
-            <div class="w-12 h-0.5 bg-gradient-to-r ${style.border.replace('border-', 'from-')} ${style.border.replace('border-', 'to-')} mx-auto opacity-60"></div>
+            <div class="w-10 sm:w-12 h-0.5 bg-gradient-to-r ${style.border.replace('border-', 'from-')} ${style.border.replace('border-', 'to-')} mx-auto opacity-60"></div>
           </div>
           
           <!-- Enhanced Score Display -->
-          <div class="mb-6">
-            <div class="flex items-center justify-center space-x-6">
+          <div class="mb-4 sm:mb-6">
+            <div class="flex items-center justify-center space-x-4 sm:space-x-6">
               <div class="text-center">
-                <div class="text-3xl font-bold text-white mb-2 group-hover:scale-110 transition-transform duration-300">${userScore}</div>
-                <div class="text-xs text-gray-300 uppercase tracking-wider font-semibold">You</div>
+                <div class="text-2xl sm:text-3xl font-bold text-white mb-1 sm:mb-2 group-hover:scale-110 transition-transform duration-300">${userScore}</div>
+                <div class="text-xs text-gray-300 uppercase tracking-wider font-semibold you-label">${i18n.t('dashboard.you')}</div>
               </div>
               
               <div class="flex flex-col items-center">
-                <div class="text-2xl text-gray-400 font-light mb-1">VS</div>
-                <div class="w-8 h-0.5 bg-gradient-to-r from-gray-400 to-gray-600"></div>
+                <div class="text-lg sm:text-2xl text-gray-400 font-light mb-1">VS</div>
+                <div class="w-6 sm:w-8 h-0.5 bg-gradient-to-r from-gray-400 to-gray-600"></div>
               </div>
               
               <div class="text-center">
-                <div class="text-3xl font-bold text-white mb-2 group-hover:scale-110 transition-transform duration-300">${opponentScore}</div>
-                <div class="text-xs text-gray-300 uppercase tracking-wider font-semibold">Opponent</div>
+                <div class="text-2xl sm:text-3xl font-bold text-white mb-1 sm:mb-2 group-hover:scale-110 transition-transform duration-300">${opponentScore}</div>
+                <div class="text-xs text-gray-300 uppercase tracking-wider font-semibold opponent-label">${i18n.t('dashboard.opponent')}</div>
               </div>
             </div>
           </div>
           
           <!-- Enhanced Result Status -->
-          <div class="mb-4">
-            <div class="inline-flex items-center px-4 py-2 rounded-full 
+          <div class="mb-3 sm:mb-4">
+            <div class="inline-flex items-center px-3 py-1.5 sm:px-4 sm:py-2 rounded-full 
                  bg-gradient-to-r ${style.border.replace('border-', 'from-')} ${style.border.replace('border-', 'to-')}/20 
                  border border-current/30 backdrop-blur-sm">
-              <span class="text-lg mr-2">${style.icon}</span>
-              <span class="text-sm font-bold text-white uppercase tracking-wide">
-                ${isDraw ? 'Draw' : isWinner ? 'Victory' : 'Defeat'}
+              <span class="text-base sm:text-lg mr-1.5 sm:mr-2">${style.icon}</span>
+              <span class="text-xs sm:text-sm font-bold text-white uppercase tracking-wide defeat-label" data-is-defeat="${!isDraw && !isWinner}">
+                ${isDraw ? 'Draw' : isWinner ? 'Victory' : i18n.t('dashboard.defeat')}
               </span>
             </div>
           </div>
           
           <!-- Enhanced Game Number -->
-          <div class="text-xs text-gray-400 font-medium uppercase tracking-wider">
-            Match #${gameNumber}
+          <div class="text-xs text-gray-400 font-medium uppercase tracking-wider match-label" data-match-number="${gameNumber}">
+            ${i18n.t('dashboard.match')} #${gameNumber}
           </div>
+          
+
           
           <!-- Bottom Accent Line -->
           <div class="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r ${style.border.replace('border-', 'from-')} ${style.border.replace('border-', 'to-')} opacity-50 group-hover:opacity-100 transition-opacity duration-500"></div>
@@ -188,7 +192,7 @@ export class GameUtils {
 
   renderErrorCard(gameId: string): string {
     return `
-      <div class="relative overflow-hidden rounded-2xl 
+      <div class="relative overflow-hidden rounded-xl sm:rounded-2xl min-h-[280px] flex flex-col
            bg-gradient-to-br from-red-500/10 via-red-500/5 to-transparent 
            backdrop-filter backdrop-blur-xl border border-red-400/30 shadow-2xl
            hover:shadow-red-500/20 hover:border-red-400/50 
@@ -199,18 +203,18 @@ export class GameUtils {
         <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-red-400 to-red-500 opacity-60"></div>
         
         <!-- Content -->
-        <div class="relative z-10 p-6 text-center">
+        <div class="relative z-10 p-4 sm:p-6 text-center flex-1 flex flex-col justify-center">
           <!-- Error Icon -->
-          <div class="relative mb-4">
-            <div class="w-16 h-16 mx-auto rounded-full bg-gradient-to-br from-red-500 to-red-600 flex items-center justify-center shadow-xl">
-              <span class="text-2xl">⚠️</span>
+          <div class="relative mb-3 sm:mb-4">
+            <div class="w-12 h-12 sm:w-16 sm:h-16 mx-auto rounded-full bg-gradient-to-br from-red-500 to-red-600 flex items-center justify-center shadow-xl">
+              <span class="text-xl sm:text-2xl">⚠️</span>
             </div>
           </div>
           
           <!-- Error Message -->
-          <div class="mb-4">
-            <h3 class="text-white font-bold text-lg mb-2">Error Loading Game</h3>
-            <div class="w-12 h-0.5 bg-gradient-to-r from-red-400 to-red-500 mx-auto opacity-60"></div>
+          <div class="mb-3 sm:mb-4">
+            <h3 class="text-white font-bold text-base sm:text-lg mb-1 sm:mb-2">Error Loading Game</h3>
+            <div class="w-10 sm:w-12 h-0.5 bg-gradient-to-r from-red-400 to-red-500 mx-auto opacity-60"></div>
           </div>
           
           <!-- Game ID -->
@@ -235,6 +239,28 @@ export class GameUtils {
     if (elements.totalGames) elements.totalGames.textContent = String(totalGames);
     if (elements.totalWins) elements.totalWins.textContent = String(totalWins);
     if (elements.totalLosses) elements.totalLosses.textContent = String(totalLosses);
+  }
+  
+  updateTranslations() {
+    // Update any text elements that need translation
+    // This will be called when the language changes
+    const gameCards = document.querySelectorAll('.game-card');
+    gameCards.forEach(card => {
+      const youLabel = card.querySelector('.you-label');
+      const opponentLabel = card.querySelector('.opponent-label');
+      const matchLabel = card.querySelector('.match-label');
+      const defeatLabel = card.querySelector('.defeat-label');
+      
+      if (youLabel) youLabel.textContent = i18n.t('dashboard.you');
+      if (opponentLabel) opponentLabel.textContent = i18n.t('dashboard.opponent');
+      if (matchLabel) {
+        const matchNumber = matchLabel.getAttribute('data-match-number');
+        matchLabel.textContent = `${i18n.t('dashboard.match')} #${matchNumber}`;
+      }
+      if (defeatLabel && defeatLabel.getAttribute('data-is-defeat') === 'true') {
+        defeatLabel.textContent = i18n.t('dashboard.defeat');
+      }
+    });
   }
 
   async processGameData(gamesData: any, user: any): Promise<{

@@ -19,16 +19,18 @@ services:
   # 👥 User Service
   # Handles: profiles, friendships
   # -----------------------------
-  # user-service:
-  #   build: ./services/user-service
-  #   env_file:
-  #     - ./services/user-service/.env
-  #   volumes:
-  #     - user-data:/app/data
-  #   ports:
-  #    - "3002:3002"
-  #   networks:
-  #     - ft_net
+  user-service:
+    build: ./services/user-service
+    env_file:
+      - ./services/user-service/.env
+    volumes:
+      - user-data:/app/data
+    ports:
+      - "3002:3002"
+    depends_on:
+      - auth-service
+    networks:
+      - ft_net
 
   # -----------------------------
   # Chat Service
@@ -42,7 +44,7 @@ services:
   #   volumes:
   #     - chat-data:/app/data
   #   ports:
-  #    - "3003:3003"
+  #     - "3003:3003"
   #   networks:
   #     - ft_net
 
@@ -57,7 +59,7 @@ services:
       # - "443:443"  # Uncomment when using SSL
     depends_on:
       - auth-service
-      # - user-service
+      - user-service
       # - chat-service
     networks:
       - ft_net
@@ -68,5 +70,5 @@ networks:
 
 volumes:
   auth-data:
-  # user-data:
+  user-data:
   # chat-data:

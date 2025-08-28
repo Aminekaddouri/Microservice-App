@@ -1,5 +1,6 @@
 import { api } from '../services/api';
 import { notificationService } from '../services/notificationService';
+import { i18n } from '../services/i18n';
 
 export class NotificationDropdown {
     private dropdownId: string;
@@ -42,8 +43,8 @@ export class NotificationDropdown {
         dropdown.innerHTML = `
             <div class="p-4">
                 <div class="flex justify-between items-center mb-3">
-                    <h3 class="font-semibold text-gray-800">🔔 Notifications</h3>
-                    <button id="clear-all-${this.dropdownId}" class="text-sm text-blue-600 hover:text-blue-800">Clear All</button>
+                    <h3 class="font-semibold text-gray-800">🔔 ${i18n.t('notifications.title')}</h3>
+                    <button id="clear-all-${this.dropdownId}" class="text-sm text-blue-600 hover:text-blue-800">${i18n.t('notifications.clearAll')}</button>
                 </div>
                 <div id="${this.dropdownId}-list" class="max-h-60 overflow-y-auto">
                     <div class="text-center py-4">
@@ -155,7 +156,7 @@ export class NotificationDropdown {
                 <svg class="w-12 h-12 mx-auto mb-3 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 009.586 13H7"/>
                 </svg>
-                <p class="text-sm">${customMessage || 'No new notifications'}</p>
+                <p class="text-sm">${customMessage || i18n.t('notifications.noNew')}</p>
                 ${!customMessage ? '<p class="text-xs text-gray-400 mt-1">You\'re all caught up! 🎉</p>' : ''}
             </div>
         `;

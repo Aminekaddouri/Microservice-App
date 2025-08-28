@@ -72,13 +72,7 @@ async function userNetworkRoutes(
     { preHandler: authenticate },
     networkController.rejectFriend
   );
-
-  // ✅ Already correct
-  fastify.get<{ Params: { userId: string; targetId: string } }>(
-    '/:userId/:targetId/status',
-    { preHandler: authenticate },
-    networkController.getFriendshipStatus
-  );
+  
 }
 
 export default userNetworkRoutes;

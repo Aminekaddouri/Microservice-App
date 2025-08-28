@@ -118,7 +118,7 @@ export class DashboardManager {
       ${this.config.showUserInfo ? `
         <div id="user-info" class="relative overflow-hidden rounded-3xl w-full 
              bg-gradient-to-br from-white/10 via-white/5 to-transparent 
-             backdrop-filter backdrop-blur-xl border border-white/20 shadow-2xl p-8 sm:p-10
+             backdrop-filter backdrop-blur-xl border border-white/20 shadow-2xl p-4 sm:p-6 lg:p-8 xl:p-10
              hover:shadow-orange-500/20 hover:border-orange-400/30 transition-all duration-500
              before:absolute before:inset-0 before:bg-gradient-to-br before:from-orange-500/5 before:to-red-500/5 before:rounded-3xl">
           <div class="relative z-10">
@@ -128,7 +128,7 @@ export class DashboardManager {
       ` : ''}
 
       <!-- Enhanced Summary Cards with Better Spacing -->
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 mb-10">
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8 mb-10">
         ${this.components.renderStatsCards()}
       </div>
 
@@ -139,20 +139,20 @@ export class DashboardManager {
              backdrop-filter backdrop-blur-xl border border-white/20 shadow-2xl
              hover:shadow-blue-500/20 hover:border-blue-400/30 transition-all duration-500
              before:absolute before:inset-0 before:bg-gradient-to-br before:from-blue-500/5 before:to-purple-500/5 before:rounded-3xl">
-          <div class="relative z-10 p-8 sm:p-10">
-            <div class="text-center mb-8">
-              <h2 class="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-blue-300 to-purple-300 bg-clip-text text-transparent mb-3">
+          <div class="relative z-10 p-4 sm:p-6 lg:p-8 xl:p-10">
+            <div class="text-center mb-4 sm:mb-6 lg:mb-8">
+              <h2 class="text-xl sm:text-2xl lg:text-3xl xl:text-4xl font-bold bg-gradient-to-r from-blue-300 to-purple-300 bg-clip-text text-transparent mb-3">
                 ${i18n.t('dashboard.statistics')}
               </h2>
-              <div class="w-16 h-1 bg-gradient-to-r from-blue-400 to-purple-400 mx-auto rounded-full"></div>
+              <div class="w-12 sm:w-16 h-1 bg-gradient-to-r from-blue-400 to-purple-400 mx-auto rounded-full"></div>
             </div>
-            <div class="h-72 sm:h-80 flex justify-center">
-              <canvas id="trend-chart"></canvas>
+            <div class="h-64 sm:h-72 lg:h-80 flex justify-center">
+              <canvas id="trend-chart" width="400" height="300" class="max-w-full h-auto"></canvas>
             </div>
-            <div id="chart-placeholder" class="hidden h-72 sm:h-80 flex flex-col items-center justify-center text-center">
-              <div class="text-7xl mb-6 opacity-60">📊</div>
-              <h3 class="text-2xl font-semibold text-gray-200 mb-3">${i18n.t('dashboard.noRecentGames')}</h3>
-              <p class="text-gray-400 text-lg">${i18n.t('dashboard.playNow')}</p>
+            <div id="chart-placeholder" class="hidden h-64 sm:h-72 lg:h-80 flex flex-col items-center justify-center text-center">
+              <div class="text-5xl sm:text-6xl lg:text-7xl mb-4 sm:mb-6 opacity-60">📊</div>
+              <h3 class="text-lg sm:text-xl lg:text-2xl font-semibold text-gray-200 mb-2 sm:mb-3">${i18n.t('dashboard.noRecentGames')}</h3>
+              <p class="text-sm sm:text-base lg:text-lg text-gray-400">${i18n.t('dashboard.playNow')}</p>
             </div>
           </div>
         </div>
@@ -165,34 +165,31 @@ export class DashboardManager {
               backdrop-filter backdrop-blur-xl border border-white/20 shadow-2xl
               hover:shadow-green-500/20 hover:border-green-400/30 transition-all duration-500
               before:absolute before:inset-0 before:bg-gradient-to-br before:from-green-500/5 before:to-teal-500/5 before:rounded-3xl">
-           <div class="relative z-10 p-8 sm:p-10">
-             <div class="text-center mb-8">
-               <h2 class="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-green-300 to-teal-300 bg-clip-text text-transparent mb-3">
+           <div class="relative z-10 p-4 sm:p-6 lg:p-8 xl:p-10">
+             <div class="text-center mb-4 sm:mb-6 lg:mb-8">
+               <h2 class="text-xl sm:text-2xl lg:text-3xl xl:text-4xl font-bold bg-gradient-to-r from-green-300 to-teal-300 bg-clip-text text-transparent mb-3">
                  ${i18n.t('dashboard.recentGames')}
                </h2>
-               <div class="w-16 h-1 bg-gradient-to-r from-green-400 to-teal-400 mx-auto rounded-full"></div>
+               <div class="w-12 sm:w-16 h-1 bg-gradient-to-r from-green-400 to-teal-400 mx-auto rounded-full"></div>
              </div>
-             <div id="games-list" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 sm:gap-8"></div>
-             <div id="matches-placeholder" class="hidden text-center py-16">
-               <div class="text-7xl mb-6 opacity-60">🎮</div>
-               <h3 class="text-2xl font-semibold text-gray-200 mb-3">${i18n.t('dashboard.noRecentGames')}</h3>
-               <p class="text-gray-400 text-lg">${i18n.t('dashboard.playNow')}</p>
+             <div id="games-list" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 lg:gap-6 xl:gap-8"></div>
+             <div id="matches-placeholder" class="hidden text-center py-8 sm:py-12 lg:py-16">
+               <div class="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl mb-4 sm:mb-6 opacity-60">🎮</div>
+               <h3 class="text-lg sm:text-xl lg:text-2xl font-semibold text-gray-200 mb-2 sm:mb-3">${i18n.t('dashboard.noRecentGames')}</h3>
+               <p class="text-sm sm:text-base lg:text-lg text-gray-400">${i18n.t('dashboard.playNow')}</p>
              </div>
              <button id="see-more-btn" 
-                     class="mt-8 px-10 py-4 bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-full 
+                     class="mt-4 sm:mt-6 lg:mt-8 px-6 sm:px-8 lg:px-10 py-2 sm:py-3 lg:py-4 bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-full 
                             hover:from-orange-600 hover:to-red-600 transform hover:scale-105 
                             transition-all duration-300 mx-auto block hidden font-semibold shadow-xl
-                            border border-orange-400/30 hover:border-orange-300/50">
+                            border border-orange-400/30 hover:border-orange-300/50 text-sm sm:text-base">
                ${i18n.t('dashboard.loadMoreMatches')}
              </button>
            </div>
          </div>
        </div>
 
-       <!-- Enhanced Session Stats -->
-       <div class="w-full">
-         ${this.config.showSessionStats ? this.components.renderSessionSection() : ''}
-       </div>
+
      </div>
    </div>
  `;
@@ -319,38 +316,9 @@ export class DashboardManager {
       this.gameUtils.updateStatistics(0, 0, 0);
     }
 
-    // Render chart with placeholder toggle
-    const chartContainer = document.getElementById('trend-chart');
-    const chartPlaceholder = document.getElementById('chart-placeholder');
-    if (this.config.showChart && chartContainer) {
-      if (this.gamesData?.games?.length) {
-        const trendData = this.gamesData.games.map((game: any) => {
-          if (game.winner_id === this.user.id) return 1;
-          if (game.loser_id === this.user.id) return -1;
-          return 0;
-        });
-        this.components.renderTrendChart(trendData);
-        chartPlaceholder?.classList.add('hidden');
-        chartContainer.parentElement?.classList.remove('hidden');
-      } else {
-        chartPlaceholder?.classList.remove('hidden');
-        chartContainer.parentElement?.classList.add('hidden');
-      }
-    }
+    // Chart rendering is handled in processGameData() method
 
-    // Render session stats with placeholder toggle
-    const sessionStats = document.getElementById('session-stats');
-    const sessionPlaceholder = document.getElementById('session-placeholder');
-    if (this.config.showSessionStats) {
-      if (this.gamesData?.games?.length) {
-        await this.sessionStatsRenderer.renderSessionStats(this.gamesData.games);
-        sessionPlaceholder?.classList.add('hidden');
-        sessionStats?.classList.remove('hidden');
-      } else {
-        sessionPlaceholder?.classList.remove('hidden');
-        sessionStats?.classList.add('hidden');
-      }
-    }
+
 
     // Render matches
     this.renderMatches();

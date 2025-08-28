@@ -15,11 +15,14 @@ export async function renderSignup() {
 
   // Wait for translations to load before rendering
   await i18n.waitForTranslations();
+  
+  // Add auth-page class to body for scrolling
+  document.body.classList.add('auth-page');
 
   document.getElementById('app')!.innerHTML = `
-    <main class="w-full min-h-screen flex items-center justify-center">
+    <main class="w-full min-h-screen overflow-y-auto">
       <section 
-        class="relative w-full min-h-screen bg-[url('https://c.animaapp.com/meotu59csaTQmy/img/1920-1080-2.png')] bg-cover bg-center flex flex-col items-center justify-center px-6"
+        class="relative w-full min-h-screen bg-[url('https://c.animaapp.com/meotu59csaTQmy/img/1920-1080-2.png')] bg-cover bg-center flex flex-col items-center justify-start px-6 py-12 overflow-y-auto"
       >
         <!-- Overlay -->
         <div class="absolute inset-0 bg-black/30" aria-hidden="true"></div>
@@ -30,9 +33,9 @@ export async function renderSignup() {
         </div>
 
         <!-- Content -->
-        <div class="relative z-10 w-full max-w-3xl text-center space-y-6">
+        <div class="relative z-10 w-full max-w-3xl text-center space-y-6 my-4 sm:my-8">
           <!-- Beautiful Glass Container -->
-          <div class="relative backdrop-blur-xl bg-white/10 border border-white/20 rounded-3xl p-8 shadow-2xl">
+            <div class="relative backdrop-blur-xl bg-white/10 border border-white/20 rounded-3xl p-6 sm:p-8 shadow-2xl max-h-[90vh] overflow-y-auto">
             <!-- Gradient overlay for extra depth -->
             <div class="absolute inset-0 bg-gradient-to-br from-white/20 via-white/5 to-transparent rounded-3xl"></div>
             
@@ -59,16 +62,18 @@ export async function renderSignup() {
               </p>
 
               <!-- Form -->
-              <form id="signup-form" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label for="fullname" class="block text-sm font-medium text-white mb-1">${i18n.t('auth.fullName')}</label>
-                  <input type="text" id="fullname" class="w-full px-4 py-3 bg-white/5 border border-white/20 rounded-lg text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-white focus:border-transparent transition-all duration-300" placeholder="${i18n.t('auth.enterFullName')}" required>
-                  <p id="fullname-error" class="mt-1 text-sm text-red-300 hidden"></p>
-                </div>
-                <div>
-                  <label for="nickname" class="block text-sm font-medium text-white mb-1">${i18n.t('auth.nickname')}</label>
-                  <input type="text" id="nickname" class="w-full px-4 py-3 bg-white/5 border border-white/20 rounded-lg text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-white focus:border-transparent transition-all duration-300" placeholder="${i18n.t('auth.chooseNickname')}" required>
-                  <p id="nickname-error" class="mt-1 text-sm text-red-300 hidden"></p>
+              <form id="signup-form" class="space-y-4 sm:space-y-6">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label for="fullname" class="block text-sm font-medium text-white mb-1">${i18n.t('auth.fullName')}</label>
+                    <input type="text" id="fullname" class="w-full px-4 py-3 bg-white/5 border border-white/20 rounded-lg text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-white focus:border-transparent transition-all duration-300" placeholder="${i18n.t('auth.enterFullName')}" required>
+                    <p id="fullname-error" class="mt-1 text-sm text-red-300 hidden"></p>
+                  </div>
+                  <div>
+                    <label for="nickname" class="block text-sm font-medium text-white mb-1">${i18n.t('auth.nickname')}</label>
+                    <input type="text" id="nickname" class="w-full px-4 py-3 bg-white/5 border border-white/20 rounded-lg text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-white focus:border-transparent transition-all duration-300" placeholder="${i18n.t('auth.chooseNickname')}" required>
+                    <p id="nickname-error" class="mt-1 text-sm text-red-300 hidden"></p>
+                  </div>
                 </div>
                 <div class="relative">
                   <label for="picture" class="block text-sm font-medium text-white mb-1">${i18n.t('auth.profilePicture')}</label>
@@ -84,16 +89,18 @@ export async function renderSignup() {
                   <input type="file" id="picture" accept="image/jpeg,image/png" class="hidden">
                   <p id="picture-error" class="mt-1 text-sm text-red-300 hidden"></p>
                 </div>
-                <div>
-                  <label for="email" class="block text-sm font-medium text-white mb-1">${i18n.t('auth.email')}</label>
-                  <input type="email" id="email" class="w-full px-4 py-3 bg-white/5 border border-white/20 rounded-lg text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-white focus:border-transparent transition-all duration-300" placeholder="${i18n.t('auth.enterEmail')}" required>
-                  <p id="email-error" class="mt-1 text-sm text-red-300 hidden"></p>
-                </div>
-                <div>
-                  <label for="password" class="block text-sm font-medium text-white mb-1">${i18n.t('auth.password')}</label>
-                  <input type="password" id="password" class="w-full px-4 py-3 bg-white/5 border border-white/20 rounded-lg text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-white focus:border-transparent transition-all duration-300" placeholder="${i18n.t('auth.createPassword')}" required minlength="8">
-                  <div id="password-strength" class="mt-1 text-sm hidden"></div>
-                  <p id="password-error" class="mt-1 text-sm text-red-300 hidden"></p>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label for="email" class="block text-sm font-medium text-white mb-1">${i18n.t('auth.email')}</label>
+                    <input type="email" id="email" class="w-full px-4 py-3 bg-white/5 border border-white/20 rounded-lg text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-white focus:border-transparent transition-all duration-300" placeholder="${i18n.t('auth.enterEmail')}" required>
+                    <p id="email-error" class="mt-1 text-sm text-red-300 hidden"></p>
+                  </div>
+                  <div>
+                    <label for="password" class="block text-sm font-medium text-white mb-1">${i18n.t('auth.password')}</label>
+                    <input type="password" id="password" class="w-full px-4 py-3 bg-white/5 border border-white/20 rounded-lg text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-white focus:border-transparent transition-all duration-300" placeholder="${i18n.t('auth.createPassword')}" required minlength="8">
+                    <div id="password-strength" class="mt-1 text-sm hidden"></div>
+                    <p id="password-error" class="mt-1 text-sm text-red-300 hidden"></p>
+                  </div>
                 </div>
                 <div>
                   <label for="confirm-password" class="block text-sm font-medium text-white mb-1">${i18n.t('auth.confirmPassword')}</label>
@@ -102,7 +109,7 @@ export async function renderSignup() {
                 </div>
                 <button 
                   type="submit" 
-                  class="md:col-span-2 group relative w-full bg-gradient-to-r from-orange-500/90 to-orange-600/90 hover:from-orange-500 hover:to-orange-600 text-white rounded-2xl py-3 px-6 flex items-center justify-center shadow-xl hover:shadow-2xl transform hover:scale-[1.01] transition-all duration-300 ease-out border border-orange-400/30 hover:border-orange-400/50 overflow-hidden backdrop-blur-sm font-semibold"
+                  class="group relative w-full bg-gradient-to-r from-orange-500/90 to-orange-600/90 hover:from-orange-500 hover:to-orange-600 text-white rounded-2xl py-3 px-6 flex items-center justify-center shadow-xl hover:shadow-2xl transform hover:scale-[1.01] transition-all duration-300 ease-out border border-orange-400/30 hover:border-orange-400/50 overflow-hidden backdrop-blur-sm font-semibold"
                 >
                   <span class="relative z-10">${i18n.t('auth.signUp')}</span>
                   <div class="absolute inset-0 -translate-x-full group-hover:translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent transition-transform duration-700 ease-out"></div>
@@ -165,10 +172,8 @@ export async function renderSignup() {
           </div>
 
           <!-- Loading Indicator -->
-          -  <div id="loading-indicator" class="hidden mt-4 text-center">
-          +  <div id="loading-indicator" class="hidden mt-4 text-center relative z-10">
-          -  <div class="backdrop-blur-xl bg-white/10 border border-white/20 rounded-2xl p-4 shadow-2xl">
-          +  <div class="backdrop-blur-xl bg-white/10 border border-white/20 rounded-2xl p-4 shadow-2xl">
+          <div id="loading-indicator" class="hidden mt-4 text-center relative z-10">
+            <div class="backdrop-blur-xl bg-white/10 border border-white/20 rounded-2xl p-4 shadow-2xl">
               <div class="loader mx-auto border-4 border-white/30 border-t-white rounded-full w-8 h-8 animate-spin"></div>
               <p class="text-white/80 text-sm mt-2">${i18n.t('auth.creatingAccount')}</p>
             </div>
@@ -340,7 +345,7 @@ function setupSignupEvents() {
           const preview = document.getElementById('picture-preview') as HTMLImageElement;
           preview.src = e.target?.result as string;
           preview.classList.remove('hidden');
-          if (defaultPreview) defaultPreview.classList.add('opacity-0');
+          if (defaultPreview) defaultPreview.classList.add('hidden');
         };
         reader.readAsDataURL(file);
       }

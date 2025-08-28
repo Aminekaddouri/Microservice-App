@@ -1,5 +1,6 @@
 import { navigateTo } from "@/utils/router";
 import { tournamentSocket } from "@/pages/tournamentPage";
+import { i18n } from '@/services/i18n';
 
 export function tournamentSearchingModalHtml(): HTMLElement {
   const loadingHtml = `
@@ -8,11 +9,11 @@ export function tournamentSearchingModalHtml(): HTMLElement {
         <div class="w-20 h-20 border-4 border-t-orange-500 border-b-orange-500 rounded-full animate-spin mb-4"></div>
 
         <div class="text-white text-2xl font-bold tracking-wide">
-          Searching for Tournament to join
+          ${i18n.t('game.searchingForTournament')}
         </div>
 
         <div class="text-gray-300 mt-2 flex items-center space-x-3">
-          <span class="text-sm">Please wait</span>
+          <span class="text-sm">${i18n.t('game.pleaseWait')}</span>
           <div class="flex items-center space-x-2">
             <span class="inline-block w-2.5 h-2.5 bg-white rounded-full animate-bounce"></span>
             <span class="inline-block w-2.5 h-2.5 bg-white rounded-full animate-bounce delay-150"></span>
@@ -26,7 +27,7 @@ export function tournamentSearchingModalHtml(): HTMLElement {
         data-action="cancel-search"
         class="mt-2 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-md text-sm font-medium focus:outline-none focus:ring-2 focus:ring-red-400"
       >
-        Cancel
+        ${i18n.t('game.cancel')}
       </button>
     </div>
   `;

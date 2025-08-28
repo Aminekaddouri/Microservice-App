@@ -1,9 +1,10 @@
 import { isLoggedIn, getAccessToken } from '../utils/auth';
-import { navigateTo } from '../utils/router';
+import { navigateTo, socketsCollector } from '../utils/router';
 import {createTheGame} from '../game-tools/game-setups'
 import io from 'socket.io-client';
 import { api } from '@/services/api';
 import { getCurrentUser } from '@/utils/authState';
+import { i18n } from '@/services/i18n';
 
 import { GameMessage, gameWorldDimensions, MovePayload, StatePayload } from "../types/game-types-protocol";
 import { Pong } from '@/game-tools/pingPong';
@@ -55,6 +56,8 @@ export async function renderGame() {
       transports: ['websocket', 'polling']
   });
 
+  socketsCollector.push(socket!);
+
   socket.on('disconnect', (error: any) => {
     console.log(error);
   });
@@ -69,9 +72,9 @@ export async function renderGame() {
   const tournamentButton = document.querySelector('.tournament');
 
   // local game
-  localGameButton?.addEventListener('click', async () => {
+  localGameButton?.addEventListener('click', () => {
     // socket.on('connection', () => {
-      await localGame(socket!, app);
+      localGame(socket!, app);
     // });
   });
 
@@ -93,10 +96,10 @@ function gamePage() {
         <!-- Page Header -->
         <div class="text-center mb-12">
           <h1 class="text-5xl font-bold bg-gradient-to-r from-white via-blue-200 to-purple-200 bg-clip-text text-transparent mb-4">
-            Choose Your Game Mode
+            ${i18n.t('game.chooseGameMode')}
           </h1>
           <p class="text-xl text-gray-300 max-w-2xl mx-auto">
-            Select from our exciting game modes and challenge yourself or your friends
+            ${i18n.t('game.selectGameModes')}
           </p>
         </div>
 
@@ -123,8 +126,8 @@ function gamePage() {
               
               <!-- Title -->
               <div class="text-center">
-                <h2 class="text-3xl font-bold text-white mb-3 group-hover:text-blue-200 transition-colors duration-300">Classic</h2>
-                <p class="text-gray-300 text-lg leading-relaxed group-hover:text-gray-200 transition-colors duration-300">First to score 10 wins</p>
+                <h2 class="text-3xl font-bold text-white mb-3 group-hover:text-blue-200 transition-colors duration-300">${i18n.t('game.classic')}</h2>
+                <p class="text-gray-300 text-lg leading-relaxed group-hover:text-gray-200 transition-colors duration-300">${i18n.t('game.firstToScore')}</p>
               </div>
               
               <!-- Bottom Accent -->
@@ -153,8 +156,8 @@ function gamePage() {
               
               <!-- Title -->
               <div class="text-center">
-                <h2 class="text-3xl font-bold text-white mb-3 group-hover:text-green-200 transition-colors duration-300">Local</h2>
-                <p class="text-gray-300 text-lg leading-relaxed group-hover:text-gray-200 transition-colors duration-300">Grab a friend and play together</p>
+                <h2 class="text-3xl font-bold text-white mb-3 group-hover:text-green-200 transition-colors duration-300">${i18n.t('game.local')}</h2>
+                <p class="text-gray-300 text-lg leading-relaxed group-hover:text-gray-200 transition-colors duration-300">${i18n.t('game.grabFriendAndPlay')}</p>
               </div>
               
               <!-- Bottom Accent -->
@@ -183,8 +186,8 @@ function gamePage() {
               
               <!-- Title -->
               <div class="text-center">
-                <h2 class="text-3xl font-bold text-white mb-3 group-hover:text-purple-200 transition-colors duration-300">Tournament</h2>
-                <p class="text-gray-300 text-lg leading-relaxed group-hover:text-gray-200 transition-colors duration-300">Win 2 games to claim the trophy</p>
+                <h2 class="text-3xl font-bold text-white mb-3 group-hover:text-purple-200 transition-colors duration-300">${i18n.t('game.tournament')}</h2>
+                <p class="text-gray-300 text-lg leading-relaxed group-hover:text-gray-200 transition-colors duration-300">${i18n.t('game.win2GamesToClaim')}</p>
               </div>
               
               <!-- Bottom Accent -->
@@ -199,7 +202,7 @@ function gamePage() {
             <svg class="w-5 h-5 text-blue-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
             </svg>
-            <span class="text-gray-300 text-sm font-medium">Click on any card to start playing</span>
+            <span class="text-gray-300 text-sm font-medium">${i18n.t('game.clickAnyCard')}</span>
           </div>
         </div>
       </div>

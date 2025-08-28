@@ -1,5 +1,6 @@
 import { logout, isLoggedIn, getAccessToken, verifyToken } from '../utils/auth';
 import { navigateTo } from '../utils/router';
+import { navigationManager } from '../utils/NavigationManager';
 import io from 'socket.io-client';
 import { api } from '@/services/api';
 import { getCurrentUser } from '@/utils/authState';
@@ -53,15 +54,7 @@ let isEventsSetup = false;
 let isSending = false;
 let chatPageManager: ChatPageManager | null = null;
 
-let socket = io('http://localhost', { //*********************//
-    auth: {
-        token: getAccessToken()
-    },
-    transports: ['websocket', 'polling'],
-    reconnection: true,
-    reconnectionAttempts: 5,
-    reconnectionDelay: 1000
-});
+let socket: SocketIOClient.Socket;
 
 
 export async function initChat() {
@@ -83,15 +76,26 @@ function startOnlineStatusRefresh() {
 
 
 async function renderChat() {
+    socket = io('http://localhost:8081', {
+        auth: {
+            token: getAccessToken()
+        },
+        transports: ['websocket', 'polling'],
+        reconnection: true,
+        reconnectionAttempts: 5,
+        reconnectionDelay: 1000
+    });
+    setupSocketConnection();
+
     app = document.getElementById("app") as HTMLElement;
     if (!app) {
         console.error('App element not found');
         return;
     }
 
-    if (socket.connected) {
-        socket.disconnect();
-    }
+    // if (socket.connected) {
+    //     socket.disconnect();
+    // }
     isEventsSetup = false;
     isSocketSetup = false;
 
@@ -278,12 +282,7 @@ async function renderChat() {
                         <h3 class="font-semibold text-white ${unreadCount > 0 ? 'font-bold' : ''} truncate text-sm group-hover:text-white/90 transition-colors duration-300">
                             ${friendUser?.fullName || 'Unknown'}
                         </h3>
-                        <div class="flex items-center gap-1">
-                            <div class="w-2 h-2 ${isOnline ? 'bg-green-400' : 'bg-red-400'} rounded-full opacity-60"></div>
-                            <span class="text-xs text-white/60 group-hover:text-white/80 transition-colors duration-300">
-                                ${isOnline ? i18n.t('chat.online') : i18n.t('chat.offline')}
-                            </span>
-                        </div>
+                        
                     </div>
                     
                     ${friendUser?.nickName ? `
@@ -317,10 +316,9 @@ async function renderChat() {
         (socket as any).auth.token = currentToken;
     }
     
-    if (!socket.connected) {
-        socket.connect();
-    }
-    setupSocketConnection();
+    // if (!socket.connected) {
+    //     socket.connect();
+    // }
     setupChatEvents();
     setupSidebarNotificationEventsAlternative();
     setupMobileResponsive();
@@ -874,9 +872,8 @@ function setupChatEvents() {
 
     const logoutBtn = document.getElementById('logout-btn');
     if (logoutBtn) {
-        logoutBtn.addEventListener('click', async () => {
-            await logout();
-            navigateTo('/');
+        logoutBtn.addEventListener('click', () => {
+            navigationManager.handleLogout();
         });
     }
 
@@ -899,7 +896,7 @@ export function setupAddUserModal() {
 
     const modal = document.getElementById('add-user-modal');
     const closeModalBtn = document.getElementById('close-modal-btn');
-    const searchInput = document.getElementById('search-user-input') as HTMLInputElement;
+    const searchInput = document.getElementById('search-input') as HTMLInputElement;
 
     if (modal) {
         modal.classList.remove('hidden');
@@ -1043,10 +1040,11 @@ export async function searchUsers(query: string) {
         showModalNotification('info', i18n.t('chat.searchingUsers'));
 
         // Fetch all required data in parallel for better performance
-        const [usersResponse, friendsResponse, blockedResponse] = await Promise.all([
+        const [usersResponse, friendsResponse, blockedResponse, pendingResponse] = await Promise.all([
             api.getAllUsers(),
             api.readFriendList(),
-            api.getBlockedUsers().catch(() => ({ blockedUsers: [] })) // Fallback if blocked users API fails
+            api.getBlockedUsers().catch(() => ({ blockedUsers: [] })), // Fallback if blocked users API fails
+            api.getPendingFriendRequests().catch(() => ({ requests: [] })) // Fallback if pending requests API fails
         ]);
 
         const currentUser = getCurrentUser();
@@ -1091,6 +1089,14 @@ export async function searchUsers(query: string) {
             });
         }
 
+        // Get pending friend requests
+        const pendingRequests = Array.isArray(pendingResponse.requests) ? pendingResponse.requests : 
+                               Array.isArray((pendingResponse as any).pendingRequests) ? (pendingResponse as any).pendingRequests :
+                               Array.isArray((pendingResponse as any).pending) ? (pendingResponse as any).pending : [];
+        const pendingRequestIds = pendingRequests
+            .filter((req: any) => req.user1ID === currentUser.id)
+            .map((req: any) => req.user2ID);
+
         updateSearchStats(query, users.length);
         hideModalNotification();
 
@@ -1098,18 +1104,18 @@ export async function searchUsers(query: string) {
             showModalNotification('warning', `${i18n.t('chat.noUsersFound')} "${query}"`);
         }
 
-        displaySearchResults(users);
+        displaySearchResults(users, pendingRequestIds);
         
     } catch (error) {
         console.error('❌ Error searching users:', error);
         showModalNotification('error', i18n.t('chat.failedToSearchUsers'));
         updateSearchStats(query, 0);
-        displaySearchResults([]);
+        displaySearchResults([], []);
     }
 }
 
 
-function displaySearchResults(users: any[]) {
+function displaySearchResults(users: any[], pendingRequestIds: string[] = []) {
     const resultsContainer = document.getElementById('search-results');
     if (!resultsContainer) return;
 
@@ -1131,7 +1137,23 @@ function displaySearchResults(users: any[]) {
         return;
     }
 
-    resultsContainer.innerHTML = users.map((user, index) => `
+    resultsContainer.innerHTML = users.map((user, index) => {
+        const requestAlreadySent = pendingRequestIds.includes(user.id);
+        const buttonClass = requestAlreadySent 
+            ? "group/btn relative overflow-hidden bg-gray-500 text-white px-3 sm:px-6 py-2 sm:py-2.5 rounded-lg sm:rounded-xl font-medium transition-all duration-300 shadow-md flex-shrink-0 cursor-default" 
+            : "add-friend-btn group/btn relative overflow-hidden bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white px-3 sm:px-6 py-2 sm:py-2.5 rounded-lg sm:rounded-xl font-medium transition-all duration-300 shadow-md hover:shadow-lg transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-orange-500/50 flex-shrink-0";
+        
+        const buttonIcon = requestAlreadySent
+            ? `<svg class="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+              </svg>`
+            : `<svg class="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+              </svg>`;
+        
+        const buttonText = requestAlreadySent ? i18n.t('chat.requestAlreadySent') : i18n.t('chat.add');
+        
+        return `
         <div class="group relative bg-white/60 backdrop-blur-sm border border-gray-200/50 rounded-xl sm:rounded-2xl p-3 sm:p-4 hover:bg-white/80 hover:border-orange-300/50 transition-all duration-300 hover:shadow-lg hover:scale-[1.02] animate-in slide-in-from-bottom-2" style="animation-delay: ${index * 50}ms">
             <!-- Gradient hover effect -->
             <div class="absolute inset-0 bg-gradient-to-r from-orange-500/5 to-blue-500/5 rounded-xl sm:rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
@@ -1159,22 +1181,22 @@ function displaySearchResults(users: any[]) {
                 
                 <!-- Enhanced add friend button -->
                 <button 
-                    class="add-friend-btn group/btn relative overflow-hidden bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white px-3 sm:px-6 py-2 sm:py-2.5 rounded-lg sm:rounded-xl font-medium transition-all duration-300 shadow-md hover:shadow-lg transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-orange-500/50 flex-shrink-0"
+                    class="${buttonClass}"
                     data-user-id="${user.id}"
                     data-user-name="${user.fullName || 'Unknown'}"
+                    ${requestAlreadySent ? 'disabled' : ''}
                 >
                     <span class="relative z-10 flex items-center space-x-1 sm:space-x-2">
-                        <svg class="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
-                        </svg>
-                        <span class="text-xs sm:text-sm">${i18n.t('chat.add')}</span>
+                        ${buttonIcon}
+                        <span class="text-xs sm:text-sm">${buttonText}</span>
                     </span>
-                    <!-- Button shine effect -->
-                    <div class="absolute inset-0 -translate-x-full group-hover/btn:translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent transition-transform duration-700 ease-out"></div>
+                    ${!requestAlreadySent ? `<!-- Button shine effect -->
+                    <div class="absolute inset-0 -translate-x-full group-hover/btn:translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent transition-transform duration-700 ease-out"></div>` : ''}
                 </button>
             </div>
         </div>
-    `).join('');
+        `;
+    }).join('');
 
     // Add enhanced event listeners with improved feedback
     resultsContainer.querySelectorAll('.add-friend-btn').forEach(btn => {
@@ -1296,6 +1318,16 @@ async function addFriend(friendId: string, friendName: string, buttonElement: HT
                 hideAddUserModal();
             }, 2000);
 
+        } else if (response.status === 400 && response.message?.includes('already sent')) {
+            buttonElement.textContent = i18n.t('chat.requestAlreadySent');
+            buttonElement.classList.remove('bg-blue-600', 'hover:bg-blue-700', 'opacity-50', 'cursor-not-allowed');
+            buttonElement.classList.add('bg-gray-500');
+            
+            showModalNotification('info', `${i18n.t('chat.requestAlreadySent')} to ${friendName}`);
+            
+            setTimeout(() => {
+                hideAddUserModal();
+            }, 2000);
         } else {
             throw new Error(response.message || 'Failed to send friend request');
         }
@@ -1653,17 +1685,7 @@ export async function showUserInfo() {
                     <div class="absolute inset-0 bg-gradient-to-r from-orange-400/15 to-red-400/15"></div>
                     <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-16">
                         <!-- Back Button -->
-                        <div class="mb-6">
-                            <button 
-                                id="back-to-chat" 
-                                class="inline-flex items-center px-6 py-3 bg-white/10 hover:bg-white/20 text-white rounded-xl shadow-md hover:shadow-lg backdrop-blur-md border border-white/20 hover:border-white/30 transition-all duration-300 transform hover:scale-105"
-                            >
-                                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
-                                </svg>
-                                ${i18n.t('chat.backToChat')}
-                            </button>
-                        </div>
+             
                         <div class="text-center space-y-4">
                             <h1 class="text-5xl sm:text-6xl lg:text-7xl font-bold bg-gradient-to-r from-orange-300 via-red-300 to-pink-300 bg-clip-text text-transparent mb-6 tracking-tight">
                                 ${i18n.t('chat.friendProfile')}
@@ -1710,42 +1732,22 @@ export async function showUserInfo() {
                                     
                                     <!-- Enhanced User Stats Quick View -->
                                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-6">
-                                        <div class="relative overflow-hidden bg-gradient-to-br from-blue-500/20 to-blue-600/20 backdrop-blur-md border border-blue-400/30 text-white rounded-2xl p-6 text-center hover:shadow-lg hover:shadow-blue-500/20 transition-all duration-300 transform hover:scale-105">
-                                            <div class="text-3xl font-bold text-blue-300" id="total-games-preview">-</div>
-                                            <div class="text-sm text-blue-200 font-medium mt-1">${i18n.t('chat.totalGames')}</div>
+                                        <div class="relative overflow-hidden bg-gradient-to-br from-blue-500/20 to-blue-600/20 backdrop-blur-md border border-blue-400/30 text-white rounded-xl sm:rounded-2xl p-4 sm:p-6 text-center hover:shadow-lg hover:shadow-blue-500/20 transition-all duration-300 transform hover:scale-105">
+                                            <div class="text-2xl sm:text-3xl font-bold text-blue-300" id="total-games-preview">-</div>
+                                            <div class="text-xs sm:text-sm text-blue-200 font-medium mt-1">${i18n.t('chat.totalGames')}</div>
                                         </div>
-                                        <div class="relative overflow-hidden bg-gradient-to-br from-green-500/20 to-green-600/20 backdrop-blur-md border border-green-400/30 text-white rounded-2xl p-6 text-center hover:shadow-lg hover:shadow-green-500/20 transition-all duration-300 transform hover:scale-105">
-                                            <div class="text-3xl font-bold text-green-300" id="total-wins-preview">-</div>
-                                            <div class="text-sm text-green-200 font-medium mt-1">${i18n.t('chat.wins')}</div>
+                                        <div class="relative overflow-hidden bg-gradient-to-br from-green-500/20 to-green-600/20 backdrop-blur-md border border-green-400/30 text-white rounded-xl sm:rounded-2xl p-4 sm:p-6 text-center hover:shadow-lg hover:shadow-green-500/20 transition-all duration-300 transform hover:scale-105">
+                                            <div class="text-2xl sm:text-3xl font-bold text-green-300" id="total-wins-preview">-</div>
+                                            <div class="text-xs sm:text-sm text-green-200 font-medium mt-1">${i18n.t('chat.wins')}</div>
                                         </div>
-                                        <div class="relative overflow-hidden bg-gradient-to-br from-purple-500/20 to-purple-600/20 backdrop-blur-md border border-purple-400/30 text-white rounded-2xl p-6 text-center hover:shadow-lg hover:shadow-purple-500/20 transition-all duration-300 transform hover:scale-105">
-                                            <div class="text-3xl font-bold text-purple-300" id="win-rate-preview">-</div>
-                                            <div class="text-sm text-purple-200 font-medium mt-1">${i18n.t('chat.winRate')}</div>
+                                        <div class="relative overflow-hidden bg-gradient-to-br from-purple-500/20 to-purple-600/20 backdrop-blur-md border border-purple-400/30 text-white rounded-xl sm:rounded-2xl p-4 sm:p-6 text-center hover:shadow-lg hover:shadow-purple-500/20 transition-all duration-300 transform hover:scale-105">
+                                            <div class="text-2xl sm:text-3xl font-bold text-purple-300" id="win-rate-preview">-</div>
+                                            <div class="text-xs sm:text-sm text-purple-200 font-medium mt-1">${i18n.t('chat.winRate')}</div>
                                         </div>
                                     </div>
                                     
                                     <!-- Action Buttons -->
-                                    <div class="flex flex-col sm:flex-row gap-4 mt-8 justify-center md:justify-start">
-                                        <button 
-                                            id="play-game-btn" 
-                                            class="inline-flex items-center justify-center px-8 py-4 bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white font-bold rounded-2xl shadow-lg hover:shadow-xl backdrop-blur-md border border-green-400/30 hover:border-green-300/50 transition-all duration-300 transform hover:scale-105 group"
-                                        >
-                                            <svg class="w-6 h-6 mr-3 group-hover:animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h1.01M15 10h1.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                            </svg>
-                                            ${i18n.t('chat.playGame')}
-                                        </button>
-                                        
-                                        <button 
-                                            id="block-user-btn" 
-                                            class="inline-flex items-center justify-center px-8 py-4 bg-gradient-to-r from-red-500 to-rose-500 hover:from-red-600 hover:to-rose-600 text-white font-bold rounded-2xl shadow-lg hover:shadow-xl backdrop-blur-md border border-red-400/30 hover:border-red-300/50 transition-all duration-300 transform hover:scale-105 group"
-                                        >
-                                            <svg class="w-6 h-6 mr-3 group-hover:animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728L5.636 5.636m12.728 12.728L18.364 5.636M5.636 18.364l12.728-12.728"></path>
-                                            </svg>
-                                            ${i18n.t('chat.blockUser')}
-                                        </button>
-                                    </div>
+                                   
                                 </div>
                             </div>
                         </div>
@@ -1931,7 +1933,7 @@ async function renderUserGames(userId: string) {
                                 
                                 <div class="space-y-3 text-sm">
                                     <div class="flex justify-between items-center p-2 rounded-lg bg-white/5">
-                                        <span class="text-gray-300 font-medium">Result:</span>
+                                        <span class="text-gray-300 font-medium">${i18n.t('game.result')}:</span>
                                         <span class="${resultColor} font-bold text-lg">${resultText}</span>
                                     </div>
                                     
@@ -1948,7 +1950,7 @@ async function renderUserGames(userId: string) {
                                     <div class="flex justify-between items-center p-2 rounded-lg bg-white/5">
                                         <span class="text-gray-300 font-medium">${i18n.t('chat.status')}:</span>
                                         <span class="text-xs px-3 py-1 rounded-full bg-gradient-to-r from-green-500 to-green-600 text-green-100 font-medium shadow-lg">
-                                            ${game.status?.toUpperCase() || 'COMPLETED'}
+                                            ${game.status?.toUpperCase() || i18n.t('game.finished')}
                                         </span>
                                     </div>
                                 </div>
@@ -2298,7 +2300,7 @@ function hideSearchLoading() {
 
 function clearSearchResults() {
     const resultsContainer = document.getElementById('search-results');
-    const searchInput = document.getElementById('search-user-input') as HTMLInputElement;
+    const searchInput = document.getElementById('search-input') as HTMLInputElement;
 
     if (resultsContainer) {
         resultsContainer.innerHTML = `
@@ -2316,4 +2318,54 @@ function clearSearchResults() {
     }
 
     updateSearchStats('', 0);
+}
+
+// Cleanup function to properly destroy ChatPageManager and remove socket listeners
+function cleanupChatPage() {
+    console.log('🧹 Cleaning up ChatPage resources...');
+    
+    if (chatPageManager) {
+        console.log('🔌 Destroying ChatPageManager and removing socket listeners...');
+        chatPageManager.destroy();
+        chatPageManager = null;
+    }
+    
+    // Clear any remaining intervals or timeouts
+    if (typeof window !== 'undefined') {
+        // Clear any chat-related intervals that might be running
+        const highestId = window.setTimeout(() => {}, 0);
+        for (let i = 0; i < highestId; i++) {
+            window.clearTimeout(i);
+        }
+    }
+    
+    console.log('✅ ChatPage cleanup completed');
+}
+
+// Add cleanup event listeners when the page loads
+function setupChatPageCleanup() {
+    // Cleanup when navigating away from the page
+    window.addEventListener('beforeunload', cleanupChatPage);
+    
+    // Cleanup when the page is hidden (mobile/tab switching)
+    document.addEventListener('visibilitychange', () => {
+        if (document.hidden) {
+            console.log('📱 Page hidden, cleaning up chat resources...');
+            cleanupChatPage();
+        }
+    });
+    
+    // Listen for router navigation events
+    window.addEventListener('popstate', cleanupChatPage);
+    
+    // Custom event for manual cleanup
+    window.addEventListener('chat-page-cleanup', cleanupChatPage);
+}
+
+// Expose cleanup function globally for router integration
+(window as any).cleanupChatPage = cleanupChatPage;
+
+// Initialize cleanup when the module loads
+if (typeof window !== 'undefined') {
+    setupChatPageCleanup();
 }

@@ -86,7 +86,8 @@
     "verificationError": "Error de verificación",
     "verificationEmailResentSuccessfully": "¡Correo de verificación reenviado exitosamente!",
     "failedToResendVerificationEmail": "Error al reenviar el correo de verificación.",
-    "errorResendingVerificationEmail": "Error al reenviar el correo de verificación",
+    "failedToResendVerificationEmail": "Error al reenviar el correo de verificación.",
+    "failedEmailVerification": "Error al verificar el estado del correo electrónico",
     "verificationCheckTimedOut": "Tiempo de verificación agotado. Por favor intenta reenviar el correo."
   },
   "dashboard": {
@@ -143,7 +144,16 @@
     "chatRoom": "Sala de chat",
     "friends": "Amigos",
     "noFriendsOnline": "No hay amigos en línea",
-    "noFriendsFound": "No se encontraron amigos"
+    "noFriendsFound": "No se encontraron amigos",
+    "addNewFriend": "Agregar nuevo amigo",
+    "discoverAndConnect": "Descubre y conecta con nuevas personas",
+    "startYourSearch": "Comienza tu búsqueda",
+    "readyToSearch": "Listo para buscar",
+    "enterToSearch": "Presiona Enter para buscar",
+    "startTypingToSearch": "Comienza a escribir para buscar usuarios",
+    "findFriendsByUsername": "Encuentra amigos por su nombre de usuario o dirección de correo",
+    "accept": "Aceptar",
+    "decline": "Rechazar"
   },
   "profile": {
     "editProfile": "Editar perfil",
@@ -232,7 +242,12 @@
     "error": "Error",
     "refreshPage": "Actualizar página",
     "next": "Siguiente",
-    "unknownError": "Error desconocido"
+    "unknownError": "Error desconocido",
+    "confirmLogout": "Confirmar cierre de sesión",
+    "logoutMessage": "¿Estás seguro de que quieres cerrar sesión?",
+    "logoutWarning": "Se cerrará tu sesión de la cuenta",
+    "logoutNote": "Puedes iniciar sesión nuevamente en cualquier momento con tus credenciales",
+    "signOut": "Cerrar sesión"
   },
   "game": {
     "firstToScore": "Primero en anotar 10 victorias",
@@ -247,7 +262,34 @@
     "firstToScore10Wins": "Primero en anotar 10 victorias",
     "failedToLoadGames": "Error al cargar los juegos",
     "opponentDisconnected": "Oponente desconectado",
-    "otherPlayerLeftGame": "El otro jugador ha abandonado el juego."
+    "otherPlayerLeftGame": "El otro jugador ha abandonado el juego.",
+    "chooseGameMode": "Elige el modo de juego",
+    "selectGameModes": "Selecciona modos de juego",
+    "clickAnyCard": "Haz clic en cualquier tarjeta",
+    "player": "JUGADOR",
+    "searchingForOpponent": "Buscando oponente",
+    "pleaseWait": "Por favor, espera",
+    "cancel": "Cancelar",
+    "timeOut": "Tiempo agotado",
+    "noOpponentFound": "No se encontró oponente",
+    "pleaseRetryLater": "Por favor, inténtalo más tarde",
+    "gamePage": "Página de juego",
+    "searchingForTournament": "Buscando torneo para unirse al juego",
+    "themeEditor": "Editor de Tema del Juego",
+    "customizeColors": "Personalizar Colores",
+    "preview": "Vista Previa",
+    "boardBackground": "Fondo del Tablero",
+    "leftPaddle": "Paleta Izquierda",
+    "rightPaddle": "Paleta Derecha",
+    "ball": "Pelota",
+    "resetToDefault": "Restablecer a Predeterminado",
+    "saveTheme": "Guardar Tema",
+    "customizeGameAppearance": "Personalizar Apariencia del Juego",
+    "currentTheme": "Tema Actual",
+    "personalizeGame": "Personaliza tu juego con colores personalizados",
+    "customColorsForGame": "Colores personalizados para tablero, paletas y pelota",
+    "modifyGameTheme": "Modificar Tema del Juego",
+    "playGame": "Jugar"
   },
   "errors": {
     "networkError": "Error de red. Por favor, verifica tu conexión.",
@@ -258,5 +300,10 @@
     "forbidden": "No tienes permiso para acceder a este recurso.",
     "tryAgain": "Por favor, inténtalo de nuevo",
     "failedToBlockUser": "❌ Error al bloquear usuario"
+  },
+  "notifications": {
+    "title": "Notificaciones",
+    "clearAll": "Borrar Todo",
+    "noNew": "No hay nuevas notificaciones"
   }
 }

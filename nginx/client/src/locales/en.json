@@ -86,6 +86,7 @@
     "verificationEmailResentSuccessfully": "Verification email resent successfully!",
     "failedToResendVerificationEmail": "Failed to resend verification email.",
     "errorResendingVerificationEmail": "Error resending verification email",
+    "failedEmailVerification": "Failed to check email verification status",
     "verificationCheckTimedOut": "Verification check timed out. Please try resending the email."
   },
   "dashboard": {
@@ -111,7 +112,11 @@
     "statistics": "Statistics",
     "noRecentGames": "No recent games",
     "playNow": "Start playing to see your game history!",
-    "recentGames": "Recent Games"
+    "recentGames": "Recent Games",
+    "opponent": "Opponent",
+    "you": "You",
+    "match": "Match",
+    "defeat": "Defeat"
   },
   "chat": {
     "selectFriend": "Select a friend to start chatting",
@@ -131,7 +136,10 @@
     "score": "Score",
     "date": "Date",
     "status": "Status",
+    "friendProfile": "Friend Profile",
+    "viewUserInfoAndStats": "View user information and game statistics 🏆",
     "userInfo": "View user information and game statistics 🏆",
+    "winRate": "Win Rate",
     "gameHistory": "Game History",
     "loadingGames": "Loading games...",
     "noGamesDescription": "This user hasn't played any games yet.",
@@ -142,7 +150,26 @@
     "chatRoom": "Chat Room",
     "friends": "Friends",
     "noFriendsOnline": "No friends online",
-    "noFriendsFound": "No friends found"
+    "noFriendsFound": "No friends found",
+    "addNewFriend": "Add New Friend",
+    "discoverAndConnect": "Discover and connect with new people",
+    "startYourSearch": "Start Your Search",
+    "readyToSearch": "Ready to search",
+    "enterToSearch": "Enter to search",
+    "startTypingToSearch": "Start typing to search for users",
+    "findFriendsByUsername": "Find friends by their username or email address",
+    "searchingUsers": "Searching for users...",
+    "noUsersFound": "No users found for",
+    "failedToSearchUsers": "Failed to search users",
+    "userSessionExpired": "User session expired",
+    "noResultsFound": "No results found",
+    "tryDifferentKeywords": "Try different keywords",
+    "accept": "Accept",
+    "decline": "Decline",
+    "add": "Add",
+    "adding": "Adding...",
+    "addFriend": "Add Friend",
+    "requestAlreadySent": "Request Sent"
   },
   "profile": {
     "editProfile": "Edit Profile",
@@ -175,6 +202,7 @@
     "accountActions": "Account Actions",
     "enterFullName": "Enter your full name",
     "enterNickname": "Enter your nickname",
+    "viewProfille": "View Profile",
     "enterCurrentPassword": "Enter your current password",
     "enterNewPassword": "Enter your new password",
     "confirmNewPassword": "Confirm your new password",
@@ -231,11 +259,18 @@
     "refreshPage": "Refresh Page",
     "error": "Error",
     "next": "Next",
-    "unknownError": "Unknown error"
+    "unknownError": "Unknown error",
+    "confirmLogout": "Confirm Logout",
+    "logoutMessage": "Are you sure you want to sign out?",
+    "logoutWarning": "You will be signed out of your account",
+    "logoutNote": "You can sign back in anytime with your credentials",
+    "signOut": "Sign Out"
   },
   "game": {
     "firstToScore": "First to score 10 wins",
     "completed": "COMPLETED",
+    "finished": "FINISHED",
+    "result": "Result",
     "failedToLoad": "Failed to load games",
     "tryAgainLater": "Please try again later",
     "firstToScore10Wins": "First to score 10 wins",
@@ -246,7 +281,34 @@
     "grabFriendAndPlay": "Grab a friend and play together",
     "win2GamesToClaim": "Win 2 games to claim the trophy",
     "opponentDisconnected": "Opponent Disconnected",
-    "otherPlayerLeftGame": "The other player has left the game."
+    "otherPlayerLeftGame": "The other player has left the game.",
+    "chooseGameMode": "Choose Game Mode",
+    "selectGameModes": "Select Game Modes",
+    "clickAnyCard": "Click Any Card",
+    "player": "PLAYER",
+    "searchingForOpponent": "Searching for opponent",
+    "pleaseWait": "Please wait",
+    "cancel": "Cancel",
+    "timeOut": "Time Out",
+    "noOpponentFound": "No opponent found",
+    "pleaseRetryLater": "Please try again later",
+    "gamePage": "Game Page",
+    "searchingForTournament": "Searching for Tournament to join in the game",
+    "themeEditor": "Game Theme Editor",
+    "customizeColors": "Customize Colors",
+    "preview": "Preview",
+    "boardBackground": "Board Background",
+    "leftPaddle": "Left Paddle",
+    "rightPaddle": "Right Paddle",
+    "ball": "Ball",
+    "resetToDefault": "Reset to Default",
+    "saveTheme": "Save Theme",
+    "customizeGameAppearance": "Customize Game Appearance",
+    "currentTheme": "Current Theme",
+    "personalizeGame": "Personalize your game with custom colors",
+    "customColorsForGame": "Custom colors for board, paddles, and ball",
+    "modifyGameTheme": "Modify Game Theme",
+    "playGame": "Play Game"
   },
   "errors": {
     "networkError": "Network error. Please check your connection.",
@@ -257,5 +319,10 @@
     "forbidden": "You don't have permission to access this resource.",
     "tryAgain": "Please try again",
     "failedToBlockUser": "❌ Failed to block user"
+  },
+  "notifications": {
+    "title": "Notifications",
+    "clearAll": "Clear All",
+    "noNew": "No new notifications"
   }
 }

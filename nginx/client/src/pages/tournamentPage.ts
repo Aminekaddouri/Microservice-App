@@ -6,6 +6,13 @@ import { isLoggedIn, getAccessToken } from '../utils/auth';
 import io, { Socket } from 'socket.io-client';
 import {searchUsers} from "./ChatPage";
 import { tournamentSearchingModalHtml } from "@/components/tournament-component";
+import { online } from "@/game-tools/online-game-tools";
+import { createTheGame } from "@/game-tools/game-setups";
+import { countDownAnimation } from "@/game-tools/uiCreator";
+import { GameMessage } from "@/types/game-types-protocol";
+import { createGameOverPageHtml, createOpponentDisconnectedPageHtml } from "@/components/game-components";
+
+import {socketsCollector} from '@/utils/router';
 
 export let tournamentSocket: SocketIOClient.Socket;
 type PlayerData = {
@@ -43,6 +50,7 @@ export async function renderTournament() {
   if (!app) return;
 
   tournamentSocket.on('connect', () => {
+    socketsCollector.push(tournamentSocket);
     app.innerHTML = '';
     app.appendChild(tournamentSearchingModalHtml());
       // send request to play online
@@ -114,6 +122,50 @@ export async function renderTournament() {
       } else {
         app.innerHTML = `<div class="tournament-message">${JSON.stringify(data)}</div>`;
       }
+    });
+
+    tournamentSocket.on('matchProposal', async (data: any) => {
+      const pong = await createTheGame(app);
+      if (pong) {
+        pong.setLeftPaddleEvents(tournamentSocket!);
+        // await pong.setNames(data.players);
+      }
+      const animation = countDownAnimation();
+      tournamentSocket?.emit('tournament:matchAccepted');
+      animation.startCountdown();
+      setTimeout(() => {
+        animation.stopCountdown();
+      }, 3000);
+  
+      tournamentSocket?.on('tournament:state', (data: GameMessage) => {
+        console.log('states=========');
+        if (!pong) return;
+        pong.updateBall(data.payload.ball);
+        pong.updatePaddles(data.payload.paddles);
+      });
+  
+      // update score
+      tournamentSocket.on('tournament:updateScore', (data: number[]) => {
+        pong?.setScore(data);
+      });
+          
+      tournamentSocket?.on('tournament:gameOver', (data: any) => { // remove the any data type
+        console.log('game over', data);
+        const gameFrame = document.getElementById('gameFrame');
+        gameFrame?.appendChild(createGameOverPageHtml());
+        pong?.setWinnerName();
+        tournamentSocket.disconnect();
+      });
+
+      tournamentSocket?.on('oppenentDisconnected', () => {
+      app.innerHTML = '';
+      app.appendChild(createOpponentDisconnectedPageHtml());
+      pong?.stop();
+    });
+
+      // accept the proposal
+      tournamentSocket.emit('proposal:accept');
+      console.log('tournament match accepted');
     });
   });
 

@@ -1,4 +1,6 @@
 import { setNotification } from '@/utils/notification';
+import { isLoggedIn } from './auth';
+import { navigationManager } from './NavigationManager';
 
 export { setNotification } from '@/utils/notification';
 
@@ -39,17 +41,44 @@ function renderErrorPage(code: number, title: string, message: string) {
   });
 }
 
+export const socketsCollector: SocketIOClient.Socket[] = [];
+function closeSockets() {
+  socketsCollector.forEach((socket) => {
+    if (socket) socket.disconnect();
+  });
+}
+
 export function navigateTo(path: string): void {
   // Avoid re-navigating to the same path to prevent recursion and history bloat
   if (location.pathname === path) {
     return;
   }
+  closeSockets();
   window.history.pushState({}, '', path);
   renderRoute(path);
 }
 
 export async function renderRoute(path: string): Promise<void> {
   setNotification();
+  
+  // Clean up chat page resources when navigating away from chat
+  const currentPath = location.pathname;
+  if (currentPath === '/chat' && path !== '/chat') {
+    console.log('🔄 Navigating away from chat page, triggering cleanup...');
+    if (typeof (window as any).cleanupChatPage === 'function') {
+      (window as any).cleanupChatPage();
+    }
+  }
+  
+  // Clean up auth-page class when navigating away from auth pages
+  if (path !== '/login' && path !== '/signup') {
+    document.body.classList.remove('auth-page');
+  }
+  
+  // Ensure proper shell state before rendering route
+  const loggedIn = isLoggedIn();
+  navigationManager.ensureShellState(path, loggedIn);
+  
   if (path in routes) {
     const route = routes[path];
     try {

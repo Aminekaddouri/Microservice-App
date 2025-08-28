@@ -1,6 +1,7 @@
 import { Pong} from "./pingPong";
 import * as uiCreator from "./uiCreator";
 import {gameWorldDimensions} from "../types/game-types-protocol";
+import { loadAndApplyTheme } from '@/services/themeService';
 export let mount: any;
 
 export async function createTheGame(app: HTMLElement) {
@@ -25,7 +26,7 @@ export async function createTheGame(app: HTMLElement) {
   app.innerHTML = '';
   app.appendChild(gameContainer);
 
-
+  // Create game elements with theme support
   const gameFrame = await uiCreator.createGameFrame();
   const leftPaddle = await uiCreator.createPaddle('left');
   const rightPaddle = await uiCreator.createPaddle('right');

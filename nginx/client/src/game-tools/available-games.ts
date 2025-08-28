@@ -55,7 +55,7 @@ export async function localGame(socket: SocketIOClient.Socket, app: HTMLElement)
   }, 3000);
 }
 
-export function onlineGame(socket: SocketIOClient.Socket, app: HTMLElement) {
+export async function onlineGame(socket: SocketIOClient.Socket, app: HTMLElement) {
   // send request to play online
   socket?.emit('onlineGame');
   // a loading page can be set here

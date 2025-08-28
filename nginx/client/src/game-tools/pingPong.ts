@@ -141,41 +141,23 @@ export class Pong {
     // Ensure dimensions are current before calculating position
     this.updateDimensions();
     
-    // Convert normalized coordinates (0-1) to pixel coordinates
-    // Since ball uses transform: translate(-50%, -50%), coordinates represent the center
+    // Enhanced boundary checking to prevent ball from going out of bounds
     const ballSize = parseFloat(this.ball.el.style.width) || 20;
-    const ballRadius = ballSize / 2;
+    const maxX = this.parentD.w - ballSize;
+    const maxY = this.parentD.h - ballSize;
     
-    // Calculate pixel position with proper boundary checking for centered ball
-    const pixelX = coord.x * this.parentD.w;
-    const pixelY = coord.y * this.parentD.h;
-    
-    // Clamp to boundaries considering ball is centered on coordinates
-    const clampedX = Math.max(ballRadius, Math.min(pixelX, this.parentD.w - ballRadius));
-    const clampedY = Math.max(ballRadius, Math.min(pixelY, this.parentD.h - ballRadius));
-    
-    this.ball.coord = {
-      x: clampedX,
-      y: clampedY
+    coord = {
+      x: Math.max(0, Math.min(coord.x * this.parentD.w, maxX)),
+      y: Math.max(0, Math.min(coord.y * this.parentD.h, maxY))
     };
+    
+    this.ball.coord = coord;
   }
 
   updatePaddles(paddlesInfo: Record<number, { x: number; y: number }>) {
     this.paddles.forEach((paddle, index) => {
-      if (paddlesInfo[index]?.y) {
-        // Convert normalized coordinates (0-1) to pixel coordinates
-        // Since paddles use transform: translate(-50%, -50%), coordinates represent the center
-        const pixelY = paddlesInfo[index].y * this.parentD.h;
-        
-        // Get paddle height for boundary checking
-        const paddleHeight = parseFloat(paddle.el.style.height) || 100;
-        const paddleHalfHeight = paddleHeight / 2;
-        
-        // Clamp to boundaries considering paddle is centered on coordinates
-        const clampedY = Math.max(paddleHalfHeight, Math.min(pixelY, this.parentD.h - paddleHalfHeight));
-        
-        paddle.setCoord(clampedY);
-      }
+      if (paddlesInfo[index]?.y)
+        paddle.setCoord(paddlesInfo[index].y * this.parentD.h);
     })
   }
 

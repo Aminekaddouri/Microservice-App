@@ -8,6 +8,10 @@ export type User = {
   picture: string;
   password: string | null;
   verified?: boolean;
+  isGoogleUser?: boolean;
+  twoFactorEnabled?: boolean;
+  twoFactorSecret?: string | null;
+  twoFactorBackupCodes?: string | null;
   joinedAt?: string;
 };
 
@@ -18,6 +22,7 @@ export async function findAllUsers(): Promise<User[]> {
 
 export async function findUserById(id: string): Promise<User | null> {
   const db = await openDB();
+  
   const user = await db.get<User>('SELECT * FROM User WHERE id = ?', [id]);
   return user || null;
 }

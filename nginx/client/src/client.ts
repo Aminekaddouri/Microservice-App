@@ -15,6 +15,7 @@ import { renderFriendGame } from './pages/friendGame'
 import { renderProfile } from './pages/ProfilePage';
 import { LanguageSwitcher } from './components/LanguageSwitcher';
 import { i18n } from './services/i18n';
+import { navigationManager } from './utils/NavigationManager';
 
 // Make i18n available globally for debugging and access
 (window as any).i18n = i18n;
@@ -32,26 +33,21 @@ function buildShellHTML(): string {
             <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0h6" />
             </svg>
-            <span class="text-xs font-medium">Home</span>
+            <span class="text-xs font-medium">${i18n.t('nav.dashboard')}</span>
           </button>
           <button id="mode-1-btn-mobile" aria-label="Chat" class="flex flex-col items-center p-3 rounded-xl text-orange-400 hover:text-orange-300 transition-all duration-300 hover:bg-orange-500/10 focus:outline-none focus:ring-2 focus:ring-orange-500/50">
             <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
             </svg>
-            <span class="text-xs font-medium">Chat</span>
+            <span class="text-xs font-medium">${i18n.t('nav.chat')}</span>
           </button>
           <button id="mode-2-btn-mobile" aria-label="Game" class="flex flex-col items-center p-3 rounded-xl text-orange-400 hover:text-orange-300 transition-all duration-300 hover:bg-orange-500/10 focus:outline-none focus:ring-2 focus:ring-orange-500/50">
             <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
-            <span class="text-xs font-medium">Game</span>
+            <span class="text-xs font-medium">${i18n.t('game.classic')}</span>
           </button>
-          <button id="mode-3-btn-mobile" aria-label="Tournament" class="flex flex-col items-center p-3 rounded-xl text-orange-400 hover:text-orange-300 transition-all duration-300 hover:bg-orange-500/10 focus:outline-none focus:ring-2 focus:ring-orange-500/50">
-            <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
-            </svg>
-            <span class="text-xs font-medium">Tournament</span>
-          </button>
+          
         </div>
       </nav>
 
@@ -71,11 +67,6 @@ function buildShellHTML(): string {
           <button id="mode-2-btn" aria-label="Game" class="w-11 h-11 rounded-2xl bg-black/35 hover:bg-orange-700 flex items-center justify-center cursor-pointer transition-all duration-300 ease-in-out hover:scale-110 focus:outline-none focus:ring-2 focus:ring-orange-400/50 group">
             <svg class="w-5 h-5 text-white group-hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-          </button>
-          <button id="mode-3-btn" aria-label="Tournament" class="w-11 h-11 rounded-2xl bg-black/35 hover:bg-orange-700 flex items-center justify-center cursor-pointer transition-all duration-300 ease-in-out hover:scale-110 focus:outline-none focus:ring-2 focus:ring-orange-400/50 group">
-            <svg class="w-5 h-5 text-white group-hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
             </svg>
           </button>
           <button id="settings-btn" aria-label="Settings" class="w-11 h-11 rounded-2xl bg-black/35 hover:bg-orange-700 flex items-center justify-center cursor-pointer transition-all duration-300 ease-in-out hover:scale-110 focus:outline-none focus:ring-2 focus:ring-orange-400/50 group">
@@ -146,21 +137,6 @@ function buildShellHTML(): string {
   `;
 }
 
-function ensureShellForPath(path: string, loggedIn: boolean) {
-  const root = document.getElementById('root') as HTMLElement | null;
-  if (!root) return;
-  const shouldShowShell = loggedIn && !publicRoutes.includes(path);
-  const shellExists = !!document.querySelector('.home-page');
-
-  if (shouldShowShell && !shellExists) {
-    root.innerHTML = buildShellHTML();
-    initListeners();
-    setupShellEnhancements();
-  } else if (!shouldShowShell && shellExists) {
-    root.innerHTML = '<div id="app"></div>';
-  }
-}
-
 function updateHeaderProfileImage() {
   const currentUser = getCurrentUser();
   const headerProfileImage = document.getElementById('header-profile-image') as HTMLImageElement;
@@ -229,8 +205,8 @@ function setupShellEnhancements() {
                 </div>
               </div>
               <div>
-                <h3 class="text-xl font-bold text-gray-800">Add New Friend</h3>
-                <p class="text-sm text-gray-600">Discover and connect with new people</p>
+                <h3 class="text-xl font-bold text-gray-800">${i18n.t('chat.addNewFriend')}</h3>
+        <p class="text-sm text-gray-600">${i18n.t('chat.discoverAndConnect')}</p>
               </div>
             </div>
             <button id="close-modal-btn" class="group relative p-2 text-gray-400 hover:text-gray-600 transition-all duration-200 rounded-full hover:bg-gray-100/50">
@@ -258,7 +234,7 @@ function setupShellEnhancements() {
                 </svg>
                 <input 
                   type="text" 
-                  id="search-user-input" 
+                  id="search-input" 
                   placeholder="Search by name, email, or username..." 
                   class="w-full pl-10 sm:pl-12 pr-12 sm:pr-16 py-3 sm:py-4 bg-white/70 backdrop-blur-sm border border-gray-200/50 rounded-2xl focus:outline-none focus:ring-2 focus:ring-orange-500/50 focus:border-orange-500/50 transition-all duration-300 text-gray-700 placeholder-gray-400 shadow-sm hover:shadow-md text-sm sm:text-base"
                 />
@@ -266,7 +242,7 @@ function setupShellEnhancements() {
                   <div class="hidden" id="search-loading">
                     <div class="w-4 h-4 border-2 border-orange-500/30 border-t-orange-500 rounded-full animate-spin"></div>
                   </div>
-                  <div class="text-xs text-gray-400 hidden sm:block">Enter to search</div>
+                  <div class="text-xs text-gray-400 hidden sm:block">${i18n.t('chat.enterToSearch')}</div>
                 </div>
               </div>
             </div>
@@ -284,7 +260,7 @@ function setupShellEnhancements() {
                     </svg>
                   </div>
                 </div>
-                <h4 class="font-semibold text-gray-700 mb-1 sm:mb-2 text-sm sm:text-base">Start Your Search</h4>
+                <h4 class="font-semibold text-gray-700 mb-1 sm:mb-2 text-sm sm:text-base">${i18n.t('chat.startYourSearch')}</h4>
                 <p class="text-xs sm:text-sm text-gray-500">Type a name or email to find new friends</p>
               </div>
             </div>
@@ -295,7 +271,7 @@ function setupShellEnhancements() {
             <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between space-y-2 sm:space-y-0">
               <div class="flex items-center space-x-2">
                 <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                <span id="search-stats" class="text-xs sm:text-sm font-medium text-gray-600">Ready to search</span>
+                <span id="search-stats" class="text-xs sm:text-sm font-medium text-gray-600">${i18n.t('chat.readyToSearch')}</span>
               </div>
               <div class="flex items-center space-x-2 bg-gray-100/50 rounded-full px-2 sm:px-3 py-1 sm:py-1.5">
                 <svg class="w-3 h-3 sm:w-4 sm:h-4 text-gray-500" fill="currentColor" viewBox="0 0 20 20">
@@ -339,21 +315,17 @@ async function initApp() {
   if (!isPublic) {
     const isValid = await verifyToken();
     if (!isValid) {
-      ensureShellForPath('/login', false);
       return navigateTo('/login');
     }
-    ensureShellForPath(currentPath, true);
     return await renderRoute(currentPath);
   }
 
   // If we're at the root path and user is logged in, redirect to dashboard
   if (currentPath === '/' && isLoggedIn()) {
-    ensureShellForPath('/dashboard', true);
     return navigateTo('/dashboard');
   }
 
-  // Public route: show only the login/signup page without the shell
-  ensureShellForPath(currentPath, false);
+  // Public route: render the route (NavigationManager handles shell state)
   return await renderRoute(currentPath);
 }
 
@@ -398,10 +370,9 @@ function initListeners() {
     navigateTo('/profile');
   });
 
-  // Logout button (desktop only)
+  // Logout button (desktop only) - Use NavigationManager for consistent behavior
   document.getElementById('logout-btn')?.addEventListener('click', () => {
-    logout();
-    navigateTo('/login');
+    navigationManager.handleLogout();
   });
 
   // Header action buttons
@@ -414,10 +385,5 @@ function initListeners() {
   });
 }
 
-// Update shell visibility after every route render
-window.addEventListener('route:rendered', async (e: any) => {
-  const path = e?.detail?.path ?? location.pathname;
-  const logged = await isLoggedIn();
-  ensureShellForPath(path, logged);
-});
+// NavigationManager now handles shell state management through the router
 

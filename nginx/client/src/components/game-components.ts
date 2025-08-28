@@ -1,4 +1,5 @@
 import { navigateTo } from "@/utils/router";
+import { i18n } from '@/services/i18n';
 
 export function createPatternLoadingPageHtml(): HTMLElement {
   const loadingHtml = `
@@ -7,11 +8,11 @@ export function createPatternLoadingPageHtml(): HTMLElement {
         <div class="w-20 h-20 border-4 border-t-orange-500 border-b-orange-500 rounded-full animate-spin mb-4"></div>
 
         <div class="text-white text-2xl font-bold tracking-wide">
-          Searching for opponent
+          ${i18n.t('game.searchingForOpponent')}
         </div>
 
         <div class="text-gray-300 mt-2 flex items-center space-x-3">
-          <span class="text-sm">Please wait</span>
+          <span class="text-sm">${i18n.t('game.pleaseWait')}</span>
           <div class="flex items-center space-x-2">
             <span class="inline-block w-2.5 h-2.5 bg-white rounded-full animate-bounce"></span>
             <span class="inline-block w-2.5 h-2.5 bg-white rounded-full animate-bounce delay-150"></span>
@@ -26,7 +27,7 @@ export function createPatternLoadingPageHtml(): HTMLElement {
         data-action="cancel-search"
         class="mt-2 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-md text-sm font-medium focus:outline-none focus:ring-2 focus:ring-red-400 transition-colors duration-200"
       >
-        Cancel
+        ${i18n.t('game.cancel')}
       </button>
     </div>
   `;
@@ -79,9 +80,9 @@ export function createMatchTimeoutPageHtml(): HTMLElement {
   const html = `
     <div class="flex flex-col items-center space-y-8 text-center">
       <div role="status" aria-live="polite" class="flex flex-col items-center space-y-2">
-        <div class="text-white text-6xl font-extrabold">Time Out</div>
-        <div class="text-white text-2xl">No opponent found</div>
-        <div class="text-white text-lg">Please try again later</div>
+        <div class="text-white text-6xl font-extrabold">${i18n.t('game.timeOut')}</div>
+        <div class="text-white text-2xl">${i18n.t('game.noOpponentFound')}</div>
+        <div class="text-white text-lg">${i18n.t('game.pleaseRetryLater')}</div>
       </div>
 
       <div class="flex space-x-6">
@@ -90,7 +91,7 @@ export function createMatchTimeoutPageHtml(): HTMLElement {
           id="toGamePage"
           class="px-8 py-4 text-xl bg-orange-600 text-white font-semibold rounded-lg hover:bg-orange-700 focus:outline-none focus:ring-4 focus:ring-orange-400"
         >
-          Game Page
+          ${i18n.t('game.gamePage')}
         </button>
       </div>
     </div>
@@ -108,8 +109,6 @@ export function createMatchTimeoutPageHtml(): HTMLElement {
   overlay.innerHTML = html;
   return overlay;
 }
-
-import { i18n } from '@/services/i18n';
 
 export function createOpponentDisconnectedPageHtml(): HTMLElement {
   const html = `

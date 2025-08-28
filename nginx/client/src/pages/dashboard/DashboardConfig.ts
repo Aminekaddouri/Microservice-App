@@ -13,7 +13,7 @@ export const defaultConfig: DashboardConfig = {
   matchesPerPage: 8,
   sessionsPerPage: 3,
   showChart: true,
-  showSessionStats: true,
+  showSessionStats: false,
   showUserInfo: true,
   theme: 'dark'
 };
